@@ -17,9 +17,7 @@ class UserSeeder extends Seeder
         User::create([
             'username' => 'admin',
             'password' => bcrypt('admin'),
-            'email' => 'admin@ratafd.xyz',
             'full_name' => 'Administrator',
-            'email_verified_at' => date('Y-m-d H:i:s'),
             'created_at' => date('Y-m-d H:i:s'),
             'created_by' => 0,
 
