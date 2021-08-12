@@ -110,8 +110,9 @@ class KaderController extends Controller
 	public function save(Request $request)
 	{
     // dd($request->all());
-    // $date = Carbon::createFromFormat('Y-m-d',$request->tanggal_lahir);
+    // $date = Carbon::createFromFormat('d/m/Y',$request->tanggal_lahir);
     // $usableDate = $date->format('Y-m-d');
+    // dd($usableDate);
     $request->validate([
       'nama_lengkap' => 'required',
       'nama_panggilan' => 'required',
@@ -139,7 +140,7 @@ class KaderController extends Controller
         'nama_lengkap' => $request->nama_lengkap,
         'nama_panggilan' => $request->nama_panggilan,
         'tempat_lahir' => $request->tempat_lahir,
-        'tanggal_lahir' => $request->tanggal_lahir,
+        'tanggal_lahir' => Carbon::createFromFormat('d/m/Y',$request->tanggal_lahir)->format('Y-m-d'),
         'jenis_kelamin' => $request->jenis_kelamin,
         'pendidikan' => $request->pendidikan,
         'alamat' => $request->alamat,
@@ -148,7 +149,7 @@ class KaderController extends Controller
         'villages_id' => $request->villages_id,
         'telp' => $request->telp,
         'job' => $request->job,
-        'awal_anggota' => $request->awal_anggota,
+        'awal_anggota' => Carbon::createFromFormat('d/m/Y',$request->awal_anggota)->format('Y-m-d'),
         'jenjang_anggota' => $request->jenjang_anggota,
         'usia_jenjang' => $request->usia_jenjang,
         'binaan' => $request->binaan,
