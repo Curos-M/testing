@@ -26,6 +26,10 @@
   <script src="{{asset('plugins/datatables-buttons/js/buttons.colVis.min.js')}}"></script>
   <script>
     $.extend( true, $.fn.dataTable.defaults, {
+      ajax: {
+          url: "{{ url($link.'/grid') }}",
+          dataSrc: ''
+      },
       dom: '<"row"' +
         '<"col-md-12"<"row"<"col-md-6"B> > >' +
         '<"col-md-12"rt> <"col-md-12"<"row"<"col-md-5"i><"col-md-7"p>>> >',
@@ -34,9 +38,9 @@
         'pdfHtml5',
         { 
           text: "Tambah Baru",
-          className: 'btn btn-info',
+          className: "{{$canAdd ? 'btn btn-info' : 'd-none'}}",
           action: function ( e, dt, node, config ) {
-            window.location = "{{ url($link.'/edit') }}";
+              window.location = "{{ url($link.'/edit') }}";   
           }
         }
       ],

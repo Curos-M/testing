@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use DB;
 use Validation;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 
 class UserController extends Controller
@@ -52,6 +53,9 @@ class UserController extends Controller
 		$this->setBreadcrumb(['Master Data' => '#', 'User' => '/user', $label => '#']);
     $this->setHeader($label);
 
+    $data->hasRoles = $user != null ? $user->roles->pluck('name')->toArray() : [];
+		$data->roles = Role::all()->pluck('name');
+
 		return $this->render('user.edit', ['data' => $data]);
 	}
 
@@ -87,7 +91,7 @@ class UserController extends Controller
 			]);
 			$status = 'Berhasil menambah user baru.';
 		}
-
+    $user->syncRoles($request->roles);
 		$request->session()->flash('success', $status);
 
 		return redirect('/user');

@@ -16,6 +16,7 @@ class CreateKadersTable extends Migration
         Schema::create('kader', function (Blueprint $table) {
             $table->id();
             $table->string('photo')->nullable();
+            $table->string('nomor_urut')->nullable();
             $table->string('nama_lengkap');
             $table->string('nama_panggilan');
             $table->string('tempat_lahir');
@@ -30,9 +31,12 @@ class CreateKadersTable extends Migration
             $table->string('job');
             $table->date('awal_anggota');
             $table->string('jenjang_anggota');
-            $table->string('usia_jenjang');
-            $table->integer('binaan')->nullable();
-            $table->string('nama_pasangan')->nullable();
+            $table->date('usia_jenjang');
+            $table->boolean('pembina');
+            $table->bigInteger('id_pembina')->nullable();
+            $table->string('nama_pembina')->nullable();
+            $table->bigInteger('pasangan_id')->nullable();
+            $table->string('pasangan')->nullable();
             $table->string('status_pernikahan');
             $table->string('darah');
             $table->string('amanah')->nullable();

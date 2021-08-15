@@ -55,14 +55,17 @@ $('body')
             success: function(data) {
               if (!data) return;
 
-              if(data.status == 'success')
+              if(data.url){
+                window.location.href = data.url
+              }else if(data.status == 'success'){
                 $table.DataTable().ajax.reload();
-
-              sweetAlert(
-                data.status,
-                data.action,
-                data.messages,
-              );
+                sweetAlert(
+                  data.status,
+                  data.action,
+                  data.messages,
+                );
+              }
+                
             },
             error: function (e){
               sweetAlert(

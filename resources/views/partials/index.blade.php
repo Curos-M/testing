@@ -38,12 +38,12 @@
           <strong><i class="mdi mdi-bell-check-outline font-size-22 align-middle me-1"></i></strong> {{ Session::get('success') }}
         </div>
       @endif
-      <div class="container-fluid">
-      <div class="card card-default color-palette-box">
-        <div class="card-body">
-          @yield('content')
+      @if (Session::get('warning'))
+        <div class="alert alert-warning" role="alert">
+          <strong><i class="mdi mdi-bell-check-outline font-size-22 align-middle me-1"></i></strong> {{ Session::get('warning') }}
         </div>
-      </div>
+      @endif
+      @yield('content')
     </section>
     <!-- /.content -->
   </div>

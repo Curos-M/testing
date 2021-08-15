@@ -9,7 +9,7 @@
         <img src="{{asset('dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">
       </div>
       <div class="info">
-          <a href="#" class="d-block">{{$username}}</a>
+          <a href="#" class="d-block">{{$username??null}}</a>
       </div>
     </div>
     <nav class="mt-2">
@@ -30,6 +30,12 @@
                 <i class="fas fa-user nav-icon"></i>
                 <p>User</p>
               </a>
+            <li class="nav-item">
+              <a href="{{url('/role')}}" class="nav-link">
+                <i class="fas fa-id-badge nav-icon"></i>
+                <p>Peran</p>
+              </a>
+            </li>
             </li>
             <li class="nav-item">
               <a href="{{url('/kader')}}" class="nav-link">
