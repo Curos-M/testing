@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use phpDocumentor\Reflection\Types\Nullable;
 
 class CreateKadersTable extends Migration
 {
@@ -16,7 +17,9 @@ class CreateKadersTable extends Migration
         Schema::create('kader', function (Blueprint $table) {
             $table->id();
             $table->string('photo')->nullable();
+            $table->string('ktp')->nullable();
             $table->string('nomor_urut')->nullable();
+            $table->string('nik')->nullable();
             $table->string('nama_lengkap');
             $table->string('nama_panggilan');
             $table->string('tempat_lahir');
@@ -38,8 +41,10 @@ class CreateKadersTable extends Migration
             $table->bigInteger('pasangan_id')->nullable();
             $table->string('pasangan')->nullable();
             $table->string('status_pernikahan');
+            $table->bigInteger('ortu_id')->nullable();
             $table->string('darah');
             $table->string('amanah')->nullable();
+            $table->boolean('verif');
             $table->timestamps();
             $table->softDeletes();
             $table->bigInteger('created_by');

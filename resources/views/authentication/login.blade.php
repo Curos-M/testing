@@ -13,11 +13,52 @@
   <link rel="stylesheet" href="{{asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css')}}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{asset('dist/css/adminlte.min.css')}}">
+  <style>
+    body{
+      background-image: url('img/1606659961.png') !important;
+    }
+    .btn-dpd{
+      background-color: #FD5000;
+      color: #fff;
+      border-top-color: rgb(253, 80, 0);
+      border-right-color: rgb(253, 80, 0);
+      border-bottom-color: rgb(253, 80, 0);
+      border-left-color: rgb(253, 80, 0);
+    }
+    .btn-dpd:hover {
+      color: #fff;
+      background-color: #C85000;
+      border-color: #C85000;
+      border-top-color: rgb(200, 80, 0);
+      border-right-color: rgb(200, 80, 0);
+      border-bottom-color: rgb(200, 80, 0);
+      border-left-color: rgb(200, 80, 0);
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    .uneditable-input:focus {   
+      border-color: rgba(253, 80, 0, 0.8) !important;
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(253, 80, 0, 0.6) !important;
+      outline: 0 none !important;
+    }
+    .card-outline.card-dpd {
+      border-top-width: 3px;
+      border-top-style: solid;
+      border-top-color: #FD5000;
+    }
+    .icheck-primary>input:first-child:checked+input[type=hidden]+label::before, .icheck-primary>input:first-child:checked+label::before {
+      background-color: #FD5000;
+      border-color: #FD5000;
+    }
+    .icheck-primary>input:first-child:not(:checked):not(:disabled):hover+input[type=hidden]+label::before, .icheck-primary>input:first-child:not(:checked):not(:disabled):hover+label::before {
+      border-color: #FD5000;
+    }
+  </style>
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
   <!-- /.login-logo -->
-  <div class="card card-outline card-primary">
+  <div class="card card-outline card-dpd">
   @if (Session::get('errorLogin'))
             <div class="alert alert-solid alert-danger" role="alert">{{ Session::get('errorLogin') }}</div>
           @endif
@@ -65,7 +106,10 @@
           </div>
           <!-- /.col -->
           <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Masuk</button>
+            <button type="submit" class="btn btn-dpd btn-block">Masuk</button>
+          </div>
+          <div class="col-12 my-2">
+          <a href="{{ url('/registrasi') }}" type="button" class="btn btn-dpd" style="width: 100%;" type="submit">Pendaftaran</a>
           </div>
           <!-- /.col -->
         </div>

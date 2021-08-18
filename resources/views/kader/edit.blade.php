@@ -4,62 +4,73 @@
 <link rel="stylesheet" href="{{asset('plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
 <style>
-  .custom-file-container__image-preview {
-  max-width: 170px;
-  margin: 0 auto;
-  overflow: hidden;
-
-}
+  .agtImg {
+    max-width: 170px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+  .ktpImg {
+    max-width: 400px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
 </style>
 @endsection
 
 @section('content-form')
 <div class="row">
-    <div class="container-fluid col-md-3">
+    <div class="container-fluid col-xl-3">
       <div class="card card-default color-pallete-box">
         <div class="card-body">
-          <div class="row">
-  <form class="needs-validation" enctype="multipart/form-data" method="POST" action="{{ url('/kader') }}">
-            <div class="custom-file-container form-group col-md-12" data-upload-id="myFirstImage">
-              <label>Foto Kader <a href="javascript:void(0)" class="custom-file-container__image-clear" title="Clear Image">x</a></label>
-              <label class="custom-file-container__custom-file mt-2 mb-3" >
-                <input type="file" name="file" class="custom-file-container__custom-file__custom-file-input" accept="image/*">
-                <span class="custom-file-container__custom-file__custom-file-control"></span>
-              </label>
-              <div class="custom-file-container__image-preview"></div>
-              <hr>
-            </div>
-            <?php $checkedStr = $data->pembina ? 'checked="checked"' : null; ?> 
-            <div class="form-group col-md-12">
-              <label for="exampleInputPassword1">Pembina/Pembimbing</label>
-              <div class="ml-2">
-                <input data-on-text="Ya" data-off-text="Tidak" data-bootstrap-switch id="pembina" type="checkbox" name="pembina" switch="none" {!! $checkedStr !!} >
-              </div>
-            </div>
-            @if($data->pembina)
-              <div class="form-group col-md-12">
-                <label for="exampleInputPassword1">Anggota Binaan</label>
-                <table id="binaan" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                  <thead>
-                    <tr>
-                      <th style="width:10%">No</th>
-                      <th>Nama</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
-            @endif
+  <form class="needs-validation" enctype="multipart/form-data" method="POST" action="{{ url('/anggota') }}">
+          <div class="custom-file-container form-group" data-upload-id="myFirstImage">
+            <label>Foto Anggota <a href="javascript:void(0)" class="custom-file-container__image-clear" id="imgAnggota" title="Clear Image">&times;</a></label>
+            <label class="custom-file-container__custom-file mt-2 mb-3" >
+              <input type="file" name="file" class="form-control custom-file-container__custom-file__custom-file-input" accept="image/*">
+              <span class="custom-file-container__custom-file__custom-file-control"></span>
+            </label>
+            <div class="custom-file-container__image-preview agtImg"></div>
+            <hr>
+            <input type="hidden" id="photo" name="photo" value="{{$data->photo}}">
           </div>
+          <?php $checkedStr = $data->pembina ? 'checked="checked"' : null; ?> 
+          <div class="form-group">
+            <label for="exampleInputPassword1">Punya Binaan</label>
+            <div class="ml-2">
+              <input data-on-text="Ya" data-off-text="Tidak" data-bootstrap-switch id="pembina" type="checkbox" name="pembina" switch="none" {!! $checkedStr !!} >
+            </div>
+          </div>
+          @if($data->pembina)
+            <div class="form-group">
+              <label for="exampleInputPassword1">Anggota Binaan</label>
+              <table id="binaan" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                <thead>
+                  <tr>
+                    <th style="width:10%">No</th>
+                    <th>Nama</th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+          @endif
         </div>
       </div>
     </div>
-    <div class="container-fluid col-md-9">
+    <div class="container-fluid col-xl-9">
       <div class="card card-default color-palette-box">
         <div class="card-body">
           <div class="col-md-12">
             <input type="hidden" name="_token" value="{{ csrf_token() }}" />
             <input type="hidden" id="id" name="id" value="{{ old('id', $data->id) }}" />
             <div class="row">
+              <div class="form-group col-md-6">
+                <label for="exampleInputEmail1">Nomor Urut Anggota</label>
+                <input type="text" disabled class="form-control" value="{{$data->nomor_urut}}" placeholder="Nomor Induk Kependudukan">
+              </div>
+              <div class="form-group col-md-{{$data->id ? '6' : '12'}}">
+                <label for="exampleInputEmail1">NIK / No. KTP</label>
+                <input type="number" required class="form-control" value="{{old('nik', $data->nik)}}" name="nik" placeholder="Nomor Induk Kependudukan">
+              </div>
               <div class="form-group col-md-6">
                 <label for="exampleInputEmail1">Nama Lengkap</label>
                 <input type="text" required class="form-control" value="{{old('nama_lengkap', $data->nama_lengkap)}}" name="nama_lengkap" id="1" placeholder="Nama Lengkap">
@@ -79,17 +90,19 @@
                   </div>
                 </div>
               </div>
-              <div class="form-group col-md-6 row">
-                <div class="col-12">
-                  <label for="exampleInputPassword1">Jenis Kelamin</label>
-                </div>
-                <div class="custom-control custom-radio col-4 ml-3">
-                  <input class="custom-control-input" {{old('jenis_kelamin', $data->jenis_kelamin) == '1' ?'checked': ''}} value="1" type="radio" id="Radio1" name="jenis_kelamin">
-                  <label for="Radio1" class="custom-control-label">Laki-laki</label>
-                </div>
-                <div class="custom-control custom-radio col-5">
-                  <input class="custom-control-input" {{old('jenis_kelamin', $data->jenis_kelamin) == '0' ?'checked': ''}} value="0" type="radio" id="Radio2" name="jenis_kelamin">
-                  <label for="Radio2" class="custom-control-label">Perempuan</label>
+              <div class="form-group col-md-6">
+                <div class="row">
+                  <div class="col-12 mb-1">
+                    <label for="exampleInputPassword1">Jenis Kelamin</label>
+                  </div>
+                  <div class="custom-control custom-radio col-4 ml-3">
+                    <input class="custom-control-input" {{old('jenis_kelamin', $data->jenis_kelamin) == '1' ?'checked': ''}} value="1" type="radio" id="Radio1" name="jenis_kelamin">
+                    <label for="Radio1" class="custom-control-label">Laki-laki</label>
+                  </div>
+                  <div class="custom-control custom-radio col-5">
+                    <input class="custom-control-input" {{old('jenis_kelamin', $data->jenis_kelamin) == '0' ?'checked': ''}} value="0" type="radio" id="Radio2" name="jenis_kelamin">
+                    <label for="Radio2" class="custom-control-label">Perempuan</label>
+                  </div>
                 </div>
               </div>
               <div class="form-group col-md-6">
@@ -125,13 +138,13 @@
                 <div class="row">
                   <div class="col-md-12"><label for="exampleInputPassword1">Alamat</label></div>   
                   <div class="col-md-4">    
-                    <select required class="form-control selectbs4" name="regencies_id" id="kota"></select>
+                    <select required class="form-control selectbs4" style="width: 100%;" name="regencies_id" id="kota"></select>
                   </div>
                   <div class="col-md-4">    
-                    <select required class="form-control selectbs4" {{isset($data->districts_id) ? '':'disabled'}} name="districts_id"  id="kecamatan"></select>
+                    <select required class="form-control selectbs4" style="width: 100%;" {{isset($data->districts_id) ? '':'disabled'}} name="districts_id"  id="kecamatan"></select>
                   </div>
                   <div class="col-md-4 mb-3">    
-                    <select required class="form-control selectbs4" {{isset($data->villages_id) ? '':'disabled'}} id="desa" name="villages_id"></select>
+                    <select required class="form-control selectbs4" style="width: 100%;" {{isset($data->villages_id) ? '':'disabled'}} id="desa" name="villages_id"></select>
                   </div>
                   <div class="col-md-12">    
                     <textarea required type="text" class="form-control"name="alamat" placeholder="Alamat">{{old('alamat', $data->alamat)}}</textarea>
@@ -144,16 +157,16 @@
                   <div class="col-md-12">
                     <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
                   </div>
-                  <div class="col-md-9">
-                    <select required class="form-control selectbs4" id="id_pembina" name="id_pembina"></select>
+                  <div class="col-md-12">
+                    <select required class="form-control selectbs4" disabled style="width: 100%;" id="id_pembina" name="id_pembina"></select>
                   </div>
-                  <div class="col-md-3">
-                    <a href="{{ url('/'.$link.'/edit/'.$data->id_pembina) }}" type="button" class="btn btn-warning">Data Pembina</a>
-                  </div>
+                  <!-- <div class="col-md-2">
+                    <a href="{{ url('/'.$link.'/edit/'.$data->id_pembina) }}" style="width: 100%;" type="button" class="btn btn-warning"><i class="fa fa-address-card"></i></a>
+                  </div> -->
                 </div>
                 @else
                   <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
-                  <select class="form-control selectbs4" id="id_pembina" name="id_pembina"></select>
+                  <select class="form-control selectbs4" style="width: 100%;" id="id_pembina" name="id_pembina"></select>
                 @endif
               </div>
               <div class="form-group col-md-6">
@@ -196,21 +209,30 @@
                   <div class="col-md-12">
                     <label for="exampleInputPassword1">Nama Pasangan</label>
                   </div>
-                  <div class="col-md-9">
-                    <select id="pasangan" class="form-control selectbs4" name="pasangan" placeholder="Nama Pasangan" {{$data->status_pernikahan != 'Kawin' ? "disabled" : " "}}></select>
+                  <div class="col-md-10">
+                    <select id="pasangan" style="width: 100%;" class="form-control selectbs4" name="pasangan" placeholder="Nama Pasangan" {{$data->status_pernikahan != 'Kawin' ? "disabled" : " "}}></select>
                   </div>
-                  <div class="col-md-3">
-                    <a href="{{ url('/'.$link.'/edit/'.$data->pasangan_id) }}" type="button" class="btn btn-success">Data Pasangan</a>
+                  <div class="col-md-2">
+                    <a href="{{ url('/'.$link.'/edit/'.$data->pasangan_id) }}" style="width: 100%;" type="button" class="btn btn-success"><i class="fa fa-address-card"></i></a>
                   </div>
                 </div>
               @else
                 <label for="exampleInputPassword1">Nama Pasangan</label>
-                <select id="pasangan" class="form-control selectbs4" name="pasangan" placeholder="Nama Pasangan" {{$data->status_pernikahan != 'Kawin' ? "disabled" : " "}}></select>
+                <select id="pasangan" style="width: 100%;" class="form-control selectbs4" name="pasangan" placeholder="Nama Pasangan" {{$data->status_pernikahan != 'Kawin' ? "disabled" : " "}}></select>
               @endif
               </div>
               <div class="form-group col-md-12">
                 <label for="exampleInputPassword1">Amanah/Kontribusi Anggota</label>
                 <input type="text" class="form-control" name="amanah" value="{{old('amanah', $data->amanah)}}" placeholder="Amanah/Kontribusi Anggota">
+              </div>
+              <div class="custom-file-container col-md-6 form-group" data-upload-id="myFirstImage1">
+                <label>Foto KTP <a href="javascript:void(0)" class="custom-file-container__image-clear" id="imgKtp" title="Clear Image">&nbsp;&times;</a></label>
+                <label class="custom-file-container__custom-file mb-3 mt-1" >
+                  <input type="file" name="file1" class="form-control custom-file-container__custom-file__custom-file-input" accept="image/*">
+                  <span class="custom-file-container__custom-file__custom-file-control"></span>
+                </label>
+                <div class="custom-file-container__image-preview ktpImg"></div>
+                <input type="hidden" id="ktp" name="ktp" value="{{$data->ktp}}">
               </div>
             </div>
             <button type="submit" class="btn btn-primary float-right ml-2 mt-3">Simpan</button>
@@ -221,9 +243,9 @@
       </div>
     </div>
     @if($data->id && $data->status_pernikahan != "Belum Kawin")
-    <div class="col-md-3">
+    <div class="col-xl-3">
     </div>
-    <div class="container-fluid col-md-9">
+    <div class="container-fluid col-xl-9">
       <div class="card card-default color-pallete-box">
         <div class="card-body">
           <div class="form-group col-md-12">
@@ -292,22 +314,8 @@
           </div>
         </div>
         <div class="form-group col-md-12">
-          @if($data->id_pembina)
-            <div class="row">
-              <div class="col-md-12">
-                <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
-              </div>
-              <div class="col-md-9">
-                <select required class="form-control selectbs4" disabled id="pembimbing_id" name="pembimbing_id"></select>
-              </div>
-              <div class="col-md-3">
-                <a href="{{ url('/'.$link.'/edit/'.$data->id_pembina) }}" type="button" class="btn btn-warning">Data Pembina</a>
-              </div>
-            </div>
-          @else
-            <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
-            <select required class="sModal form-control selectbs4" disabled id="pembimbing_id" name="pembimbing_id"></select>
-          @endif
+          <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
+          <select required class="sModal form-control selectbs4" disabled id="pembimbing_id" name="pembimbing_id"></select>
         </div>
       </div>
       <div class="modal-footer">
@@ -383,6 +391,7 @@ let desa = function(){
     }
   })
 }
+
 
 $(document).ready(function (){
 
@@ -462,9 +471,9 @@ $(document).ready(function (){
         data:null,
           render: function(data, type, full, meta){
             if(data.anak){
-              return "<a>"+data.nama+" </a>(<a href={{url('kader/edit')}}/"+data.id+">"+data.nama_ortu+"</a>)"
+              return "<a>"+data.nama+" </a>(<a href={{url('anggota/edit')}}/"+data.id+">"+data.nama_ortu+"</a>)"
             }else{
-              return "<a href={{url('kader/edit')}}/"+data.id+">"+data.nama+"</a>"
+              return "<a href={{url('anggota/edit')}}/"+data.id+">"+data.nama+"</a>"
             }
         }
       }
@@ -514,15 +523,31 @@ $(document).ready(function (){
     });
   });
 <?php 
-$foto = $data->photo ? url('storage/images/kader/thumbnail').'/'.$data->photo : url('pict/kader.png'); 
-$tulisan = $data->photo ? 'Foto Saat ini' : 'Cari Foto'; 
+$foto = $data->photo ? url('storage/images/anggota/thumbnail').'/'.$data->photo : ''; 
+$ktp = $data->ktp ? url('storage/images/ktp/thumbnail').'/'.$data->ktp : ''; 
 ?>
   var firstUpload = new FileUploadWithPreview('myFirstImage', {
     text: {
-      chooseFile: "{{$tulisan}}",
-    },images: {
-      baseImage: "{{$foto}}",
-    },
+      chooseFile: "Cari Foto",
+    }
+  })
+  if("{{$data->photo}}"){
+    firstUpload.addImagesFromPath(['{{$foto}}'])
+  }
+  $('#imgAnggota').on('click', function(){
+    $('#photo').val("")
+  })
+
+  var firstUpload1 = new FileUploadWithPreview('myFirstImage1', {
+    text: {
+      chooseFile: "Cari Foto",
+    }
+  })
+  if("{{$data->ktp}}"){
+    firstUpload1.addImagesFromPath(['{{$ktp}}'])
+  }
+  $('#imgKtp').on('click', function(){
+    $('#ktp').val("")
   })
 
   flatpickr($('.flatpickr'), {
@@ -670,7 +695,6 @@ $tulisan = $data->photo ? 'Foto Saat ini' : 'Cari Foto';
   $('#id_pembina').append('<option value={{$data->id_pembina??$data->nama_pembinaStr}}>{{$data->nama_pembina??$data->nama_pembinaStr}}</option>');
 
   $('#kota').on('change', function(){
-    
     if(this.value){
       $('#kecamatan').removeAttr('disabled')
       $('#kecamatan').val('')
@@ -713,6 +737,8 @@ $tulisan = $data->photo ? 'Foto Saat ini' : 'Cari Foto';
       $('#pembimbing_id').attr('disabled', true)
     }
   })
+
+  
 
   var id = $('#kota').val()  
   $('#kecamatan').select2({
@@ -767,6 +793,16 @@ $tulisan = $data->photo ? 'Foto Saat ini' : 'Cari Foto';
     }
   })
   
+});
+
+window.addEventListener("fileUploadWithPreview:imagesAdded", function (e) { 
+  if (e.detail.uploadId === "myFirstImage") {
+    $('#photo').val(e.detail.files[0].name)
+  }
+  
+  if (e.detail.uploadId === "myFirstImage1") {
+    $('#ktp').val(e.detail.files[0].name)
+  }
 });
 
 </script>

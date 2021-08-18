@@ -38,9 +38,9 @@
             </li>
             </li>
             <li class="nav-item">
-              <a href="{{url('/kader')}}" class="nav-link">
+              <a href="{{url('/anggota')}}" class="nav-link">
                 <i class="fas fa-users nav-icon"></i>
-                <p>Kader</p>
+                <p>Anggota</p>
               </a>
             </li>
           </ul>

@@ -53,7 +53,7 @@ class RoleSeeder extends Seeder
                 'action'     => ['view', 'add', 'edit', 'delete'],
             ],
             [
-                'name'       => 'kader',
+                'name'       => 'anggota',
                 'guard_name' => 'web',
                 'action'     => ['view', 'add', 'edit', 'delete'],
             ],

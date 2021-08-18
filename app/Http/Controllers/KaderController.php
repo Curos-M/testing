@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use App\Libs\Helpers;
+use stdClass;
 
 use function GuzzleHttp\Promise\all;
 
@@ -19,8 +20,8 @@ class KaderController extends Controller
 {
 	function __construct()
 	{
-		$this->setTitle("Kader");
-		$this->setUrl("kader");
+		$this->setTitle("Anggota");
+		$this->setUrl("anggota");
 	}
 
 	private function __db()
@@ -56,6 +57,9 @@ class KaderController extends Controller
     $data->amanah = null;
     $data->pembina = 0;
     $data->nama_pembinaStr = null;
+    $data->nik = null;
+    $data->ktp = null;
+    $data->nomor_urut = null;
 
 		return $data;
 	}
@@ -133,6 +137,9 @@ class KaderController extends Controller
     ->leftJoin("kader as p", "kader.pasangan_id", '=', 'p.id')
     ->leftJoin("kader as b", "kader.id_pembina", '=', 'b.id')
     ->select('kader.id',
+      'kader.nik',
+      'kader.nomor_urut',
+      'kader.ktp',
       'kader.nama_lengkap',
       'kader.photo',
       'kader.nama_panggilan',
@@ -168,7 +175,7 @@ class KaderController extends Controller
 		$label = $user != null ? 'Ubah' : 'Tambah Baru';
     $data->jumlah_binaan = Kader::where('id_pembina', $id)->count();
 	
-		$this->setBreadcrumb(['Master Data' => '#', 'Kader' => '/kader', $label => '#']);
+		$this->setBreadcrumb(['Master Data' => '#', 'Anggota' => '/anggota', $label => '#']);
     $this->setHeader($label);
 
 		return $this->render('kader.edit', ['data' => $data]);
@@ -198,15 +205,45 @@ class KaderController extends Controller
     ]);
     try{
       DB::beginTransaction();
-      // dd($tes);
-      $file = Helpers::prepareFile($request->all(), '/images/kader');
-      $oldPath = isset($inputs['photo']) ? $inputs['photo'] : $request->photo ;
+      $val = Kader::find($request->id);
+      $file = null;
+      $file1 = null;
+      if($request->photo != ($val ? $val->photo : null )){
+        $file = Helpers::prepareFile($request->all(), '/images/anggota');
+        if($val)
+          Helpers::removeFile($val->photo, 'images/anggota');
+      }
+      $oldPath = isset($request->photo) ? $request->photo : null ;
       $filePath = isset($file) ? $file->newName : $oldPath; 
-      // dd($filePath);
+
+      if($request->ktp != ($val ? $val->ktp : null )){
+        $file1 = Helpers::prepareFile1($request->all(), '/images/ktp');
+        if($val)
+          Helpers::removeFile($val->ktp, 'images/ktp');
+      }
+      $oldPath1 = isset($request->ktp) ? $request->ktp : null ;
+      $filePath1 = isset($file1) ? $file1->newName : $oldPath1; 
+
+      $prefix = DB::table('_regencies')
+      ->where('province_id', '15')
+      ->where('id', $request->regencies_id)
+      ->select(["id", DB::Raw("
+      Case WHEN id = '1501' THEN 'KRC'
+        WHEN id = '1572' THEN 'SPN'
+        ELSE 'NaN' END as prefix
+      ")])
+      ->first();
+
+      $latest = DB::table('kader')->where('regencies_id', $request->regencies_id)->count();
+      // dd($latest);
+
+      $no = $prefix->prefix . (str_pad((int)$latest + 1, 5, '0', STR_PAD_LEFT));
+      // dd($no);
       if(isset($request->id)){
         $user =	Kader::find($request->id);
         $user->update([
           'photo' => $filePath,
+          'nik' => $request->nik,
           'nama_lengkap' => $request->nama_lengkap,
           'nama_panggilan' => $request->nama_panggilan,
           'tempat_lahir' => $request->tempat_lahir,
@@ -226,13 +263,16 @@ class KaderController extends Controller
           'pembina' => $pembina,
           'darah' => $request->darah,
           'amanah' => $request->amanah,
+          'ktp' => $filePath1,
           'updated_by' => Auth::user()->getAuthIdentifier()
         ]);
-        $status = 'Berhasil mengubah kader.';
+        $status = 'Berhasil mengubah anggota.';
       } else {
   
         $user = Kader::create([
+          'nomor_urut' => $no,
           'photo' => $filePath,
+          'nik' => $request->nik,
           'nama_lengkap' => $request->nama_lengkap,
           'nama_panggilan' => $request->nama_panggilan,
           'tempat_lahir' => $request->tempat_lahir,
@@ -252,9 +292,11 @@ class KaderController extends Controller
           'pembina' => $pembina,
           'darah' => $request->darah,
           'amanah' => $request->amanah,
+          'ktp' => $filePath1,
+          'verif' => '1',
           'created_by' => Auth::user()->getAuthIdentifier()
         ]);
-        $status = 'Berhasil menambah kader baru.';
+        $status = 'Berhasil menambah anggota baru.';
       }
       if(!ctype_alpha($request->id_pembina) && $request->id_pembina != null){
         $user->update(['id_pembina' => $request->id_pembina, 'nama_pembina' => null]);
@@ -294,7 +336,7 @@ class KaderController extends Controller
     }
 		
 
-		return redirect('/kader/edit'.'/'.$user->id);
+		return redirect('/anggota/edit'.'/'.$user->id);
 	}
 
 	public function delete(request $request, $id)
@@ -312,7 +354,7 @@ class KaderController extends Controller
         $anak->update([
           'kader_id' => $data->pasangan_id
         ]);
-        $request->session()->flash('warning', 'Silahkan update data pasangan kader');
+        $request->session()->flash('warning', 'Silahkan update data pasangan anggota');
         Kader::find($data->pasangan_id)->update(['pasangan_id' => null]);
       }
       if($data){
@@ -320,14 +362,14 @@ class KaderController extends Controller
         $data->destroy($id);
         if($anak && $data->pasangan_id){
           $results = array(
-            'url'    => url('/kader/edit'.'/'.$data->pasangan_id)
+            'url'    => url('/anggota/edit'.'/'.$data->pasangan_id)
           );
-          $request->session()->flash('success', 'Kader Berhasil Dihapus');
+          $request->session()->flash('success', 'Anggota Berhasil Dihapus');
         }else{
           $results = array(
             'status' => 'success',
-            'action' => 'Hapus Kader',
-            'messages' => 'Kader berhasil dihapus'
+            'action' => 'Hapus Anggota',
+            'messages' => 'Anggota berhasil dihapus'
           );
         }
         

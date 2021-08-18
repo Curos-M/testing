@@ -12,6 +12,9 @@ class Kader extends Model
     protected $table = 'kader';
     protected $fillable = [
       'photo',
+      'ktp',
+      'nik',
+      'nomor_urut',
       'nama_lengkap',
       'nama_panggilan',
       'tempat_lahir',
@@ -35,6 +38,8 @@ class Kader extends Model
       'status_pernikahan',
       'darah',
       'amanah',
+      'verif',
+      'ortu_id',
       'created_by',
       'updated_by',
       'deleted_by'

@@ -15,7 +15,9 @@
                 <th>Nama Lengkap</th>
                 <th>Jenjang Keanggotaan</th>
                 <th>Nomor HP</th>
+                @if($canEdit || $canDelete)
                 <th></th>
+                @endif
               </tr>
             </thead>
             <tbody>
