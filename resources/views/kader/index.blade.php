@@ -37,15 +37,21 @@
         columns: [
           { 
             data: 'nama_lengkap',
-            searchText: true
+            searchText: true,
+            render: function(data, type, full, meta){
+              let verif = ""
+              if(!full.verif){
+                console.log(full.verif)
+                 verif += " <i style='color:#fd5000' class='fa fa-exclamation'></i>"
+              }
+              return data+verif
+            }
           },
           { 
-            data: 'jenjang_anggota',
-            searchText: true
+            data: 'nama_jenjang',
           },
           { 
             data: 'telp',
-            searchText: true
           },
           @if($canEdit || $canDelete)
           { 
@@ -68,8 +74,6 @@
           }
           @endif
         ],
-        processing: true,
-        serverSide: true
       });
   });
 </script>

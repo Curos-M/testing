@@ -43,7 +43,7 @@ $('body')
     $modal.on('show.bs.modal', function (){
       // Draws text.
       $modal.find('.modal-title').html(title).css('color', 'white').parent().css('background', '#ec4561');;
-      $modal.find('.modal-body').html('<span class="badge bg-danger"><i class="ti-help"></i></span>&nbsp;' + message);
+      $modal.find('.modal-body').html('<span class="badge bg-danger"><i class="fa fa-info"></i></span>&nbsp;' + message);
 
       // Shows and attaches click event.
       $modal.find('.modal-action-delete').removeClass('d-none')

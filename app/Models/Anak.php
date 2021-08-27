@@ -21,6 +21,7 @@ class Anak extends Model
       'pembimbing',
       'created_by',
       'updated_by',
+      'deleted_at',
       'deleted_by'
     ];
 }

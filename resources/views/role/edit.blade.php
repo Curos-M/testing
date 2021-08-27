@@ -21,7 +21,7 @@
               <label for="username" class="form-label mb-0">User</label>
               <div class="mt-0">
               @foreach($data->user as $user)
-                <h4><span class="badge bg-info">{{ $user->username }}</span></h4>
+                <h4><span class="badge bg-dpd">{{ $user->username }}</span></h4>
               @endforeach
               </div>
               <hr>
@@ -37,8 +37,8 @@
                         <label>{{$act->raw}}</label>
                         <?php $checkedStr = $act->active ? 'checked="checked"' : null; ?> 
                         <div class="custom-control custom-switch">
-                          <input data-bootstrap-switch name="roleperms[]" value="{{ $act->value }}" type="checkbox" id="{{ $act->value }}" switch="none" {!! $checkedStr !!} >
-                          <label class="form-label" for="{{ $act->value }}" data-on-label="Ya" data-off-label="X"></label>
+                          <input data-bootstrap-switch name="roleperms[]" value="{{ $act->value }}" data-on-color="dpd" type="checkbox" id="{{ $act->value }}" switch="none" {!! $checkedStr !!} >
+                          <label class="form-label" for="{{ $act->value }}" data-on-label="Ya"  data-off-label="X"></label>
                         </div>
                       </div>
                     @endforeach
@@ -47,8 +47,8 @@
               </div>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary float-right ml-2 mt-3">Simpan</button>
-          <a href="{{ url('/'.$link) }}" type="button" class="btn btn-danger float-right mt-3" type="submit">{{ isset($data->id) ? 'Kembali' : 'Batal' }}</a>
+          <button type="submit" class="btn btn-dpd float-right ml-2 mt-3">Simpan</button>
+          <a href="{{ url('/'.$link) }}" type="button" class="btn btn-black float-right mt-3" type="submit">{{ isset($data->id) ? 'Kembali' : 'Batal' }}</a>
         </form> 
       </div>
     </div>

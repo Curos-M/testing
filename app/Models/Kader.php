@@ -39,6 +39,8 @@ class Kader extends Model
       'darah',
       'amanah',
       'verif',
+      'verif_at',
+      'verif_by',
       'ortu_id',
       'created_by',
       'updated_by',

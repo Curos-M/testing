@@ -28,32 +28,35 @@
     $.extend( true, $.fn.dataTable.defaults, {
       ajax: {
           url: "{{ url($link.'/grid') }}",
-          dataSrc: ''
+          dataSrc: 'data'
       },
       dom: '<"row"' +
         '<"col-md-12"<"row"<"col-md-6"B> > >' +
-        '<"col-md-12"rt> <"col-md-12"<"row"<"col-md-5"i><"col-md-7"p>>> >',
+        '<"col-md-12"t> <"col-md-12"<"row"<"col-md-5"i><"col-md-7"p>>> >'+
+        '<"col-md-12"r>',
       buttons: [
-        'excelHtml5',
-        'pdfHtml5',
         { 
           text: "Tambah Baru",
-          className: "{{$canAdd ? 'btn btn-info' : 'd-none'}}",
+          className: "{{$canAdd ? 'btn btn-dpd' : 'd-none'}}",
           action: function ( e, dt, node, config ) {
               window.location = "{{ url($link.'/edit') }}";   
           }
         }
       ],
-      processing: false,
-      serverSide: false,
+      processing: true,
+      serverSide: true,
       oLanguage: {
         oPaginate: { "sPrevious": '<', "sNext": '>' },
-        sInfo: "Halaman _PAGE_ dari _PAGES_",
+        sInfo: "Menampilkan _START_ - _END_ data (dari _TOTAL_)",
         sLengthMenu: "Hasil :  _MENU_",
+        sEmptyTable: "Data Tidak Ditemukan",
+        sInfoEmpty: "",
+        sZeroRecords: "Tidak ada data yang bisa ditampilkan",
+        sProcessing: "<i class='fa fa-spinner fa-spin'></i>"
       },
       stripeClasses: [],
       lengthMenu: [10, 20, 50],
-      pageLength: 15,
+      pageLength: 10,
     });
   </script>
   @yield('js-table')

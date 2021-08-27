@@ -35,8 +35,8 @@
               </select>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary float-right ml-2 mt-3">Simpan</button>
-          <a href="{{ url('/'.$link) }}" type="button" class="btn btn-danger float-right mt-3" type="submit">{{ isset($data->id) ? 'Kembali' : 'Batal' }}</a>
+          <button type="submit" class="btn btn-dpd float-right ml-2 mt-3">Simpan</button>
+          <a href="{{ url('/'.$link) }}" type="button" class="btn btn-black float-right mt-3" type="submit">{{ isset($data->id) ? 'Kembali' : 'Batal' }}</a>
         </form> 
       </div>
     </div>

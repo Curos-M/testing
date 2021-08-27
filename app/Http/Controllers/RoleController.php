@@ -26,7 +26,7 @@ class RoleController extends Controller
 	public function grid(Request $request)
 	{
 		$data = Role::all();
-		return response()->json($data);
+		return datatables()->of($data)->toJson();
 	}
 
 	public function edit(request $request, $id = null)

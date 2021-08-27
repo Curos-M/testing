@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="{{asset('css/yearpicker.css')}}">
   <link rel="stylesheet" href="{{asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
   <style>
-    .flatpickr {
+    .flatpickrcolor {
       background-color: #ffffff !important ;
     }
     .yearpicker {

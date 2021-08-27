@@ -87,18 +87,7 @@
     }
     .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day.selected.inRange, .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange, .flatpickr-day.selected:focus, .flatpickr-day.startRange:focus, .flatpickr-day.endRange:focus, .flatpickr-day.selected:hover, .flatpickr-day.startRange:hover, .flatpickr-day.endRange:hover, .flatpickr-day.selected.prevMonthDay, .flatpickr-day.startRange.prevMonthDay, .flatpickr-day.endRange.prevMonthDay, .flatpickr-day.selected.nextMonthDay, .flatpickr-day.startRange.nextMonthDay, .flatpickr-day.endRange.nextMonthDay {
       background: #FD5000;
-      background-image: initial;
-      background-position-x: initial;
-      background-position-y: initial;
-      background-size: initial;
-      background-repeat-x: initial;
-      background-repeat-y: initial;
-      background-attachment: initial;
-      background-origin: initial;
-      background-clip: initial;
       background-color: rgb(253, 80, 0);
-      -webkit-box-shadow: none;
-      box-shadow: none;
       color: #fff;
       border-color: #FD5000;
       border-top-color: rgb(253, 80, 0);
@@ -156,11 +145,11 @@
                     <div class="col-md-6 form-group">
                       <div class="row">
                         <div class="col-md-12"><label for="exampleInputPassword1">Tempat dan Tanggal Lahir</label></div>
-                        <div class="col-md-4">
+                        <div class="col-md-7">
                           <input type="text" required class="form-control" value="{{old('tempat_lahir')}}" name="tempat_lahir" placeholder="Tempat Lahir">
                         </div>
-                        <div class="col-md-8">
-                          <input class="form-control flatpickr flatpickr-input" id="tanggal_lahir" value="{{old('tanggal_lahir')}}" name="tanggal_lahir" placeholder="Tanggal Lahir">
+                        <div class="col-md-5">
+                          <input class="form-control flatpickr flatpickr-input" required id="tanggal_lahir" value="{{old('tanggal_lahir')}}" name="tanggal_lahir" placeholder="Tanggal Lahir">
                         </div>
                       </div>
                     </div>
@@ -200,7 +189,7 @@
                     </div>
                     <div class="form-group col-md-6">
                       <label for="exampleInputPassword1">Golongan Darah</label>
-                      <select class="form-control" name="darah">
+                      <select required class="form-control" name="darah">
                         <option>-</option>
                         <option {{old('darah') == 'A' ?'selected': ''}}>A</option>
                         <option {{old('darah') == 'B' ?'selected': ''}}>B</option>

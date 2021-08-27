@@ -12,9 +12,8 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use App\Libs\Helpers;
-use stdClass;
+use Yajra\DataTables\Contracts\DataTable;
 
-use function GuzzleHttp\Promise\all;
 
 class KaderController extends Controller
 {
@@ -60,6 +59,7 @@ class KaderController extends Controller
     $data->nik = null;
     $data->ktp = null;
     $data->nomor_urut = null;
+    $data->verif = 0;
 
 		return $data;
 	}
@@ -73,9 +73,14 @@ class KaderController extends Controller
 
 	public function grid(Request $request)
 	{
-		$data = Kader::all();
-
-		return response()->json($data);
+		$data = Kader::leftJoin('jenjang as j', 'jenjang_anggota', '=', 'j.id')->select([
+      'kader.id',
+      'nama_lengkap',
+      'telp',
+      'j.nama as nama_jenjang',
+      'verif'
+    ]);
+		return datatables()->of($data)->toJson();
 	}
 
   public function pasangan(Request $request)
@@ -83,7 +88,8 @@ class KaderController extends Controller
 		$data = Kader::where('nama_lengkap', 'LIKE', '%'. $request->search . '%')
     ->whereNotIn('jenis_kelamin', [$request->jenis_kelamin])
     ->where('status_pernikahan', 'Kawin')
-    ->whereNull('pasangan_id');
+    ->whereNull('pasangan_id')
+    ->where('verif', '1');
     if($request->id){
       $data = $data->whereNotIn('id', [$request->id]);
     }
@@ -94,13 +100,39 @@ class KaderController extends Controller
   public function pembina(Request $request)
 	{
 		$data = Kader::where('nama_lengkap', 'LIKE', '%'. $request->search . '%')
-    ->where('pembina', '1');
+    ->where('pembina', '1')->where('verif', '1')
+    ->where('jenjang_anggota', '>', $request->jenjang);
     if($request->id && $request->ortu){
       $data = $data->whereNotIn('id', [$request->id]);
     }
     $data= $data->take(5)->get();
 		return response()->json($data);
 	}
+
+  public function searchBinaan(Request $request)
+	{
+		$data = Kader::where('nama_lengkap', 'LIKE', '%'. $request->search . '%')
+    ->whereNull('id_pembina')
+    ->whereNotIn('id', [$request->id])
+    ->where('verif', '1')
+    ->where('jenjang_anggota', '<', $request->jenjang);
+    $data= $data->take(5)->get();
+		return response()->json($data);
+	}
+
+  public function searchAnak(Request $request)
+	{
+  
+		$data = Kader::where('nama_lengkap', 'LIKE', '%'. $request->search . '%')
+    ->where('verif', '1')
+    ->whereRaw("tanggal_lahir - interval '18 y' > ?", [$request->tanggal_lahir])
+    ->whereNull('ortu_id');
+    
+    $data= $data->take(5)->get();
+    // dd($data);
+		return response()->json($data);
+	}
+
 
   public function gridBinaan(Request $request, $id = null)
 	{
@@ -114,7 +146,7 @@ class KaderController extends Controller
 
   public function gridAnak(Request $request, $id = null)
 	{
-		$data = Anak::join('kader as k','kader_id', '=' , 'k.id')
+		$anak = Anak::join('kader as k','kader_id', '=' , 'k.id')
     ->where('kader_id', $id)
     ->orWhere('k.pasangan_id', $id)
     ->select(
@@ -122,8 +154,18 @@ class KaderController extends Controller
       'nama',
       DB::raw("date_part('year', tahun_lahir) as tahun_lahir"),
       'anak.pendidikan',
-      DB::raw("CASE WHEN tarbiyah is true THEN 'Ya' ELSE 'Tidak' END as tarbiyah")
-    )->get();
+      DB::raw("CASE WHEN tarbiyah is true THEN 'Ya' ELSE 'Tidak' END as tarbiyah"),
+      DB::raw('0 as anggota')
+    );
+    $data = Kader::where('ortu_id', $id)->orWhere('pasangan_id', $id)
+    ->select([
+      'id',
+      'nama_lengkap as nama',
+      DB::raw("date_part('year', tanggal_lahir) as tahun_lahir"),
+      'pendidikan',
+      DB::raw("CASE WHEN nama_pembina is null and id_pembina is null THEN 'Tidak' ELSE 'Ya' END as tarbiyah"),
+      DB::raw('1 as anggota')
+    ])->union($anak)->orderBy('tahun_lahir', 'asc')->get();
 
 		return response()->json($data);
 	}
@@ -165,6 +207,7 @@ class KaderController extends Controller
       'kader.amanah',
       'kader.pasangan_id',
       'kader.pembina',
+      'kader.verif',
       'kader.nama_pembina as nama_pembinaStr',
       'p.nama_lengkap as nama_pasangan',
       'b.nama_lengkap as nama_pembina',
@@ -174,15 +217,18 @@ class KaderController extends Controller
 		$data = $user != null ? $user : $this->__db();
 		$label = $user != null ? 'Ubah' : 'Tambah Baru';
     $data->jumlah_binaan = Kader::where('id_pembina', $id)->count();
+
+    $jenjang = DB::table('jenjang')->get();
 	
 		$this->setBreadcrumb(['Master Data' => '#', 'Anggota' => '/anggota', $label => '#']);
     $this->setHeader($label);
 
-		return $this->render('kader.edit', ['data' => $data]);
+		return $this->render('kader.edit', ['data' => $data, 'jenjang' => $jenjang]);
 	}
 
 	public function save(Request $request)
 	{
+    // dd($request->all());
     $pembina = $request->pembina ? 1 : 0;
     $request->validate([
       'nama_lengkap' => 'required',
@@ -209,7 +255,7 @@ class KaderController extends Controller
       $file = null;
       $file1 = null;
       if($request->photo != ($val ? $val->photo : null )){
-        $file = Helpers::prepareFile($request->all(), '/images/anggota');
+        $file = Helpers::prepareAnggota($request->all(), '/images/anggota');
         if($val)
           Helpers::removeFile($val->photo, 'images/anggota');
       }
@@ -217,24 +263,16 @@ class KaderController extends Controller
       $filePath = isset($file) ? $file->newName : $oldPath; 
 
       if($request->ktp != ($val ? $val->ktp : null )){
-        $file1 = Helpers::prepareFile1($request->all(), '/images/ktp');
+        $file1 = Helpers::prepareKtp($request->all(), '/images/ktp');
         if($val)
           Helpers::removeFile($val->ktp, 'images/ktp');
       }
       $oldPath1 = isset($request->ktp) ? $request->ktp : null ;
       $filePath1 = isset($file1) ? $file1->newName : $oldPath1; 
 
-      $prefix = DB::table('_regencies')
-      ->where('province_id', '15')
-      ->where('id', $request->regencies_id)
-      ->select(["id", DB::Raw("
-      Case WHEN id = '1501' THEN 'KRC'
-        WHEN id = '1572' THEN 'SPN'
-        ELSE 'NaN' END as prefix
-      ")])
-      ->first();
+      $prefix = Helpers::prefix($request);
 
-      $latest = DB::table('kader')->where('regencies_id', $request->regencies_id)->count();
+      $latest = DB::table('kader')->where('regencies_id', $request->regencies_id)->whereNotNull('nomor_urut')->count();
       // dd($latest);
 
       $no = $prefix->prefix . (str_pad((int)$latest + 1, 5, '0', STR_PAD_LEFT));
@@ -268,6 +306,7 @@ class KaderController extends Controller
         ]);
         $status = 'Berhasil mengubah anggota.';
       } else {
+        $request->validate(['nik' => 'nullable|unique:kader,nik']);
   
         $user = Kader::create([
           'nomor_urut' => $no,
@@ -345,6 +384,7 @@ class KaderController extends Controller
       DB::beginTransaction();
       $data = Kader::find($id);
       $anak = Anak::where('kader_id', $id);
+      $anakKader = Kader::where('ortu_id', $id);
       if($anak && $data->pasangan_id == null){
         $anak->update([
           'deleted_at' => now()->toDateTimeString(),
@@ -357,6 +397,25 @@ class KaderController extends Controller
         $request->session()->flash('warning', 'Silahkan update data pasangan anggota');
         Kader::find($data->pasangan_id)->update(['pasangan_id' => null]);
       }
+      
+      if($anakKader && $data->pasangan_id){
+        $anakKader->update([
+          'ortu_id' => $data->pasangan_id
+        ]);
+        $request->session()->flash('warning', 'Silahkan update data pasangan anggota');
+        Kader::find($data->pasangan_id)->update(['pasangan_id' => null]);
+      }
+
+      $binaanKader = Kader::where('id_pembina' ,$data->id);
+      if($binaanKader){
+        $binaanKader->update(['id_pembina' => null]);
+      }
+
+      $binaanAnak = Anak::where('pembimbing_id' ,$data->id);
+      if($binaanAnak){
+        $binaanAnak->update(['pembimbing_id' => null]);
+      }
+
       if($data){
         $data->update(['deleted_by' => Auth::user()->getAuthIdentifier()]);
         $data->destroy($id);
@@ -388,6 +447,7 @@ class KaderController extends Controller
 
   public function deleteAnak($id)
 	{
+    
 		$data = Anak::find($id);
     if($data){
       $data->update(['deleted_by' => Auth::user()->getAuthIdentifier()]);
@@ -408,58 +468,126 @@ class KaderController extends Controller
 		return response()->json($results);
 	}
 
+  public function deleteAnakKader($id)
+	{
+    
+		$data = Kader::find($id);
+    if($data){
+      $data->update(['ortu_id' => null]);
+      $results = array(
+        'status' => 'success',
+        'action' => 'Hapus Anak',
+        'messages' => 'Anak berhasil dihapus'
+      );
+    }else{
+      $results = array(
+        'status' => 'error',
+        'action' => 'Kesalahan',
+        'messages' => 'Anak tidak ditemukan'
+      );
+    }
+
+		return response()->json($results);
+	}
+
   public function saveAnak(Request $request)
 	{
     // dd($request->all());
 
-    $request->validate([
-      'nama' => 'required',
-      'tahun_lahir' => 'required',
-      'pendidikan' => 'required',
-      'tarbiyah' => 'required',
-    ]);
+    if($request->anggota){
+      $user =	Kader::find($request->id);
+      $user->update([
+        'ortu_id' => $request->ortu_id,
+        'updated_by' => Auth::user()->getAuthIdentifier()
+      ]);
+      $results = array(
+        'status' => 'success',
+        'action' => 'Tambah Anak',
+        'messages' => 'Anak berhasil ditambah'
+      );
+    }else{
+      $request->validate([
+        'nama' => 'required',
+        'tahun_lahir' => 'required',
+        'pendidikan' => 'required',
+        'tarbiyah' => 'required',
+      ]);
+      try{
+        DB::beginTransaction();
+        if(isset($request->id)){
+  
+          $user =	Anak::find($request->id);
+          $user->update([
+            'kader_id' => $request->kader_id,
+            'nama' => $request->nama,
+            'tahun_lahir' => Carbon::createFromFormat('Y',$request->tahun_lahir)->format('Y-m-d'),
+            'pendidikan' => $request->pendidikan,
+            'tarbiyah' => $request->tarbiyah,
+            'updated_by' => Auth::user()->getAuthIdentifier()
+          ]);
+          $results = array(
+            'status' => 'success',
+            'action' => 'Edit Anak',
+            'messages' => 'Anak berhasil dirubah'
+          );
+        } else {
+    
+          $user = Anak::create([
+            'kader_id' => $request->kader_id,
+            'nama' => $request->nama,
+            'tahun_lahir' => Carbon::createFromFormat('Y',$request->tahun_lahir)->format('Y-m-d'),
+            'pendidikan' => $request->pendidikan,
+            'tarbiyah' => $request->tarbiyah,
+            'created_by' => Auth::user()->getAuthIdentifier()
+          ]);
+          $results = array(
+            'status' => 'success',
+            'action' => 'Tambah Anak',
+            'messages' => 'Anak berhasil ditambah'
+          );
+        }
+  
+        if(!ctype_alpha($request->pembimbing_id) && $request->pembimbing_id != null){
+          $user->update(['pembimbing_id' => $request->pembimbing_id, 'pembimbing' => null]);
+        }elseif(ctype_alpha($request->id_pembina) && $request->id_pembina != null){
+          $user->update(['pembimbing' => $request->pembimbing_id, 'pembimbing_id' => null]);
+        }elseif($request->id_pembina == null){
+          $user->update(['pembimbing' => null, 'pembimbing_id' => null]);
+        }
+  
+        DB::commit();
+      }catch(\Exception $e){
+        DB::rollback();
+        $results = array(
+          'status' => 'error',
+          'action' => 'Kesalahan',
+          'messages' => 'Hubungi Administrator'
+        );
+        dd($e);
+      }
+    }
+
+
+		return response()->json($results);
+	}
+
+  public function saveBinaan(Request $request)
+	{
     try{
       DB::beginTransaction();
-      if(isset($request->id)){
 
-        $user =	Anak::find($request->id);
+        $user =	Kader::find($request->id_binaan);
         $user->update([
-          'kader_id' => $request->kader_id,
-          'nama' => $request->nama,
-          'tahun_lahir' => Carbon::createFromFormat('Y',$request->tahun_lahir)->format('Y-m-d'),
-          'pendidikan' => $request->pendidikan,
-          'tarbiyah' => $request->tarbiyah,
+          'id_pembina' => $request->id,
+          'nama_pembina' => null,
           'updated_by' => Auth::user()->getAuthIdentifier()
         ]);
         $results = array(
           'status' => 'success',
-          'action' => 'Edit Anak',
-          'messages' => 'Anak berhasil dirubah'
+          'action' => 'Tambah Binaan',
+          'messages' => 'Binaan berhasil Ditambah'
         );
-      } else {
-  
-        $user = Anak::create([
-          'kader_id' => $request->kader_id,
-          'nama' => $request->nama,
-          'tahun_lahir' => Carbon::createFromFormat('Y',$request->tahun_lahir)->format('Y-m-d'),
-          'pendidikan' => $request->pendidikan,
-          'tarbiyah' => $request->tarbiyah,
-          'created_by' => Auth::user()->getAuthIdentifier()
-        ]);
-        $results = array(
-          'status' => 'success',
-          'action' => 'Tambah Anak',
-          'messages' => 'Anak berhasil ditambah'
-        );
-      }
-
-      if(!ctype_alpha($request->pembimbing_id) && $request->pembimbing_id != null){
-        $user->update(['pembimbing_id' => $request->pembimbing_id, 'pembimbing' => null]);
-      }elseif(ctype_alpha($request->id_pembina) && $request->id_pembina != null){
-        $user->update(['pembimbing' => $request->pembimbing_id, 'pembimbing_id' => null]);
-      }elseif($request->id_pembina == null){
-        $user->update(['pembimbing' => null, 'pembimbing_id' => null]);
-      }
+    
 
       DB::commit();
     }catch(\Exception $e){
@@ -475,4 +603,58 @@ class KaderController extends Controller
 
 		return response()->json($results);
 	}
+  public function deleteBinaan($id)
+	{
+    try{
+      DB::beginTransaction();
+
+        $user =	Kader::find($id);
+        $user->update([
+          'id_pembina' => null,
+          'nama_pembina' => null,
+          'updated_by' => Auth::user()->getAuthIdentifier()
+        ]);
+        $results = array(
+          'status' => 'success',
+          'action' => 'Hapus Binaan',
+          'messages' => 'Binaan berhasil Dihapus'
+        );
+    
+
+      DB::commit();
+    }catch(\Exception $e){
+      DB::rollback();
+      $results = array(
+        'status' => 'error',
+        'action' => 'Kesalahan',
+        'messages' => 'Hubungi Administrator'
+      );
+      dd($e);
+    }
+
+
+		return response()->json($results);
+	}
+
+  public function verif(Request $request, $id){
+
+    $data =	Kader::find($id);
+
+    $prefix = Helpers::prefix($data);
+    $latest = DB::table('kader')->where('regencies_id', $data->regencies_id)->whereNotNull('nomor_urut')->count();
+    $no = $prefix->prefix . (str_pad((int)$latest + 1, 5, '0', STR_PAD_LEFT));
+
+    if($data->nik){
+      $data->update([
+        'nomor_urut' => $no,
+        'verif' => '1',
+        'verif_by' => Auth::user()->getAuthIdentifier(),
+        'verif_at' => now()->toDateTimeString(),
+      ]);
+      $request->session()->flash('success', 'Verifikasi Berhasil');
+    }else{
+      $request->session()->flash('error', 'Gagal Memverifikasi, NIK Tidak Boleh Kosong');
+    }
+    return redirect('/anggota/edit'.'/'.$data->id);
+  }
 }

@@ -41,7 +41,7 @@ class UserController extends Controller
 	{
 		$data = User::all();
 
-		return response()->json($data);
+		return datatables()->of($data)->toJson();
 	}
 
 	public function edit(Request $request, $id = null)

@@ -7,7 +7,7 @@ use App\Http\Controllers\KaderController;
 use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RegistrasiController;
-
+use App\Http\Controllers\DashboardController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,9 +31,7 @@ Route::get('/district',  [AlamatController::class, 'district']);
 Route::get('/village',  [AlamatController::class, 'village']);
 
 Route::group(['middleware' => 'auth'], function() {
-  Route::get('/', function () {
-      return view('welcome');
-  });
+  Route::get('/',  [DashboardController::class, 'index']);	
 
   Route::get('/user',  [UserController::class, 'index'])->middleware('can:user-view');	
 	Route::get('/user/edit/{id?}',  [UserController::class, 'edit'])->middleware('can:user-view');	
@@ -44,13 +42,19 @@ Route::group(['middleware' => 'auth'], function() {
   Route::get('/anggota',  [KaderController::class, 'index'])->middleware('can:anggota-view');	
 	Route::get('/anggota/edit/{id?}',  [KaderController::class, 'edit'])->middleware('can:anggota-view');	
 	Route::get('/anggota/grid',  [KaderController::class, 'grid'])->middleware('can:anggota-view');	
+  Route::get('/search/anak',  [KaderController::class, 'searchAnak']);
 	Route::post('/anggota',  [KaderController::class, 'save']);
+  Route::post('/anggota/verif/{id}',  [KaderController::class, 'verif']);
   Route::get('/pasangan',  [KaderController::class, 'pasangan']);
   Route::get('/pembina',  [KaderController::class, 'pembina']);
+  Route::get('/binaan',  [KaderController::class, 'searchBinaan']);
   Route::get('/pembina/grid/{id}',  [KaderController::class, 'gridBinaan']);
   Route::get('/anak/grid/{id}',  [KaderController::class, 'gridAnak']);
   Route::post('/anak',  [KaderController::class, 'saveAnak']);
+  Route::post('/binaan',  [KaderController::class, 'saveBinaan']);
+  Route::delete('/binaan/{id}',  [KaderController::class, 'deleteBinaan']);
 	Route::delete('/anggota/{id}',  [KaderController::class, 'delete'])->middleware('can:anggota-delete');
+  Route::delete('/anggota/anak/{id}',  [KaderController::class, 'deleteAnakKader']);
   Route::delete('/anak/{id}',  [KaderController::class, 'deleteAnak']);
 
   Route::get('/role', [RoleController::class, 'index'])->middleware('can:role-view');
