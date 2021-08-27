@@ -40,11 +40,11 @@ class RegistrasiController extends Controller
       try{
         DB::beginTransaction();
         if($request->file){
-          $file = Helpers::prepareFile($request->all(), '/images/anggota');
+          $file = Helpers::prepareAnggota($request->all(), '/images/anggota');
         }
   
         if($request->file1){
-          $file1 = Helpers::prepareFile1($request->all(), '/images/ktp');
+          $file1 = Helpers::prepareKtp($request->all(), '/images/ktp');
         }
         
         $user = Kader::create([
