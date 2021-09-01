@@ -31,7 +31,7 @@
           dataSrc: 'data'
       },
       dom: '<"row"' +
-        '<"col-md-12"<"row"<"col-md-6"B> > >' +
+        '<"col-md-12"<"row"<"col-md-6"B><"col-md-6"f> > >' +
         '<"col-md-12"t> <"col-md-12"<"row"<"col-md-5"i><"col-md-7"p>>> >'+
         '<"col-md-12"r>',
       buttons: [
@@ -47,12 +47,14 @@
       serverSide: true,
       oLanguage: {
         oPaginate: { "sPrevious": '<', "sNext": '>' },
-        sInfo: "Menampilkan _START_ - _END_ data (dari _TOTAL_)",
+        sInfo: "Menampilkan _START_ - _END_ data (dari _MAX_)",
         sLengthMenu: "Hasil :  _MENU_",
         sEmptyTable: "Data Tidak Ditemukan",
         sInfoEmpty: "",
         sZeroRecords: "Tidak ada data yang bisa ditampilkan",
-        sProcessing: "<i class='fa fa-spinner fa-spin'></i>"
+        sProcessing: "<i class='fa fa-spinner fa-spin'></i>",
+        sSearch: 'Cari',
+        sInfoFiltered: "- Total Pencarian _TOTAL_"
       },
       stripeClasses: [],
       lengthMenu: [10, 20, 50],

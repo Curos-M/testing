@@ -108,9 +108,11 @@
           <div class="col-4">
             <button type="submit" class="btn btn-dpd btn-block">Masuk</button>
           </div>
-          <div class="col-12 my-2">
-          <a href="{{ url('/registrasi') }}" type="button" class="btn btn-dpd" style="width: 100%;" type="submit">Pendaftaran</a>
-          </div>
+          @if(env('APP_OPENREG'))
+            <div class="col-12 my-2">
+            <a href="{{ url('/registrasi') }}" type="button" class="btn btn-dpd" style="width: 100%;" type="submit">Pendaftaran</a>
+            </div>
+          @endif
           <!-- /.col -->
         </div>
       </form>

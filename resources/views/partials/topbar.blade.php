@@ -9,8 +9,20 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
       <!-- Messages Dropdown Menu -->
-      <li class="nav-item">
-        <a href="{{url('/logout')}}" class="nav-link">Logout</a>
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          {{$username??null}}
+          <i class="fa fa-caret-down"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-md dropdown-menu-right">
+          <a href="#" class="dropdown-item">
+            Ganti Password
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="{{url('logout')}}" class="dropdown-item">
+            Logout
+          </a>
+        </div>
       </li>
     </ul>
   </nav>

@@ -8,6 +8,8 @@ use App\Http\Controllers\AlamatController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RegistrasiController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\VerifController;
+use App\Http\Controllers\KelompokController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -50,6 +52,7 @@ Route::group(['middleware' => 'auth'], function() {
   Route::get('/binaan',  [KaderController::class, 'searchBinaan']);
   Route::get('/pembina/grid/{id}',  [KaderController::class, 'gridBinaan']);
   Route::get('/anak/grid/{id}',  [KaderController::class, 'gridAnak']);
+  Route::post('/anak/{id}',  [KaderController::class, 'getAnak']);
   Route::post('/anak',  [KaderController::class, 'saveAnak']);
   Route::post('/binaan',  [KaderController::class, 'saveBinaan']);
   Route::delete('/binaan/{id}',  [KaderController::class, 'deleteBinaan']);
@@ -62,5 +65,12 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::get('/role/grid', [RoleController::class, 'grid'])->middleware('can:role-view');
 	Route::post('/role', [RoleController::class, 'save']);
 	Route::delete('/role/{id}',  [RoleController::class, 'delete'])->middleware('can:role-delete');
+
+  Route::get('/verifikasi',  [VerifController::class, 'index']);	
+  Route::post('/verifikasi/{id}',  [VerifController::class, 'verif']);	
+  Route::get('/verifikasi/grid',  [VerifController::class, 'grid']);	
+  Route::post('/verifikasi/view/{id}',  [VerifController::class, 'view']);	
+
+  Route::get('/kelompok',  [KelompokController::class, 'index']);
   
 });

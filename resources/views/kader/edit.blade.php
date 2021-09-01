@@ -24,6 +24,31 @@ $verifDisabled = $data->verif ? 'disabled' : null;
 
 @section('content-form')
 <div class="row">
+  @if ($data->verif_user)
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Riwayat</h3>
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" aria-controls="riwayat" data-toggle="collapse" aria-expanded="false" data-target="#riwayat" title="Collapse">
+              <i class="fas fa-window-minimize"></i>
+            </button>
+          </div>
+        </div>
+        <div class="collapse" id="riwayat">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-6">
+                <span class="text-muted">Diverifikasi Oleh :</span>
+                <br>
+                <span class="font-weight-normal">&nbsp;{{$data->verif_user}} - {{$data->verif_date}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  @endif
     <div class="container-fluid col-xl-3">
       <div class="card card-default color-pallete-box">
         <div class="card-body">
@@ -259,9 +284,8 @@ $verifDisabled = $data->verif ? 'disabled' : null;
       </div>
     </div>
     @if($data->id && $data->status_pernikahan != "Belum Kawin")
-    <div class="col-xl-3">
-    </div>
-    <div class="container-fluid col-xl-9">
+    
+    <div class="container-fluid col-xl-9 offset-md-3">
       <div class="card card-default color-pallete-box">
         <div class="card-body">
           <div class="form-group col-md-12">
@@ -448,7 +472,7 @@ $(document).ready(function (){
         render: function(data, type, full, meta){
           let icon = "";
             if(!data.anggota){
-              icon += '<a title="Edit" type="button" class="btn btn-success btn-sm waves-effect gridEdit modalEdit"><i class="ti-marker-alt"></i> Edit</a>';
+              icon += '<a title="Edit" type="button" class="btn btn-success btn-sm waves-effect gridEdit modalEdit" id="'+data.id+'"><i class="ti-marker-alt"></i> Edit</a>';
             }else{
               icon += '<a href="{{url("/anggota/edit")}}/' + data.id +'" title="Edit" type="button" class="btn btn-success btn-sm waves-effect gridEdit"><i class="ti-marker-alt"></i> Edit</a>';
             }
@@ -478,19 +502,25 @@ $(document).ready(function (){
   });
 
   $('#anak').on( 'click', '.modalEdit', function () {
-    var data = t.row( $(this).parents('tr') ).data();
-    var $option = $("<option selected></option>").val(data.nama).text(data.nama);
-    $('#aNama').append($option).trigger('change');
-    $('#aPendidikan').val(data.pendidikan)
-    $('#aTahun').val(data.tahun_lahir)
-    $('#aId').val(data.id)
-    if(data.tarbiyah == 'Ya'){
-      $('#Radio3').prop('checked', true);
-    }else{
-      $('#Radio4').prop('checked', true);
-    }
-    $(".modal-title").html('Edit Anak')
-    $('#anakModal').modal('show'); 
+    var id = $(this).attr('id')
+    $.ajax({
+      type:'POST',
+      url:"{{url('anak')}}/"+id,
+      success: function(data){
+        var $option = $("<option selected></option>").val(data.nama).text(data.nama);
+        $('#aNama').append($option).trigger('change');
+        $('#aPendidikan').val(data.pendidikan)
+        $('#aTahun').val(data.tahun_lahir)
+        $('#aId').val(data.id)
+        if(data.tarbiyah == 'Ya'){
+          $('#Radio3').prop('checked', true);
+        }else{
+          $('#Radio4').prop('checked', true);
+        }
+        $(".modal-title").html('Edit Anak')
+        $('#anakModal').modal('show'); 
+      }
+    })
   });
 
   var bina = $('#binaan').DataTable({

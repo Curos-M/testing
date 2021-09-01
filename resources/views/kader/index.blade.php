@@ -12,6 +12,7 @@
           <table id="grid" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
             <thead>
               <tr>
+                <th>No</th>
                 <th>Nama Lengkap</th>
                 <th>Jenjang Keanggotaan</th>
                 <th>Nomor HP</th>
@@ -36,26 +37,32 @@
     let grid = $('#grid').DataTable({
         columns: [
           { 
-            data: 'nama_lengkap',
-            searchText: true,
+            data: 'nomor_urut',
+            searchable: true,
             render: function(data, type, full, meta){
-              let verif = ""
-              if(!full.verif){
-                console.log(full.verif)
-                 verif += " <i style='color:#fd5000' class='fa fa-exclamation'></i>"
+              if(!data){
+                return " <i style='color:#fd5000' class='fa fa-exclamation'></i>"
+              }else{
+                return data
               }
-              return data+verif
             }
           },
           { 
+            data: 'nama_lengkap',
+            searchable: true,
+          },
+          { 
             data: 'nama_jenjang',
+            searchable: false
           },
           { 
             data: 'telp',
+            searchable: false
           },
           @if($canEdit || $canDelete)
           { 
             data:null,
+            searchable: false,
             width:'80px',
             className: 'text-center',
             render: function(data, type, full, meta){

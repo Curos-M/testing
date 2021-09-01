@@ -60,13 +60,15 @@ class KaderController extends Controller
     $data->ktp = null;
     $data->nomor_urut = null;
     $data->verif = 0;
+    $data->verif_user = null;
+    $data->verif_date = null;
 
 		return $data;
 	}
 
 	public function index()
 	{
-		$this->setBreadcrumb(['Master Data' => '#', 'Kader' => '#']);
+		$this->setBreadcrumb(['Master Data' => '#', 'Anggota' => '#']);
     
 		return $this->render('kader.index');
 	}
@@ -75,6 +77,7 @@ class KaderController extends Controller
 	{
 		$data = Kader::leftJoin('jenjang as j', 'jenjang_anggota', '=', 'j.id')->select([
       'kader.id',
+      'kader.nomor_urut',
       'nama_lengkap',
       'telp',
       'j.nama as nama_jenjang',
@@ -157,7 +160,8 @@ class KaderController extends Controller
       DB::raw("CASE WHEN tarbiyah is true THEN 'Ya' ELSE 'Tidak' END as tarbiyah"),
       DB::raw('0 as anggota')
     );
-    $data = Kader::where('ortu_id', $id)->orWhere('pasangan_id', $id)
+    $pasangan = Kader::where('pasangan_id', $id)->first();
+    $data = Kader::whereIn('ortu_id', [$id, $pasangan->id??null])
     ->select([
       'id',
       'nama_lengkap as nama',
@@ -176,6 +180,7 @@ class KaderController extends Controller
 		$user = Kader::join("_regencies as r", "regencies_id", "=", "r.id")
     ->join("_districts as d", "districts_id", "=", "d.id")
     ->join("_villages as v", "villages_id", "=", "v.id")
+    ->leftjoin("users as u", 'verif_by', '=', 'u.id')
     ->leftJoin("kader as p", "kader.pasangan_id", '=', 'p.id')
     ->leftJoin("kader as b", "kader.id_pembina", '=', 'b.id')
     ->select('kader.id',
@@ -211,9 +216,10 @@ class KaderController extends Controller
       'kader.nama_pembina as nama_pembinaStr',
       'p.nama_lengkap as nama_pasangan',
       'b.nama_lengkap as nama_pembina',
-      'kader.id_pembina'
-      )->find($id);
-      // dd($user);
+      'kader.id_pembina',
+      'u.full_name as verif_user',
+      DB::Raw("to_char(kader.verif_at, 'dd-mm-yyyy hh24:mi:ss')as verif_date")
+      )->findOrFail($id);
 		$data = $user != null ? $user : $this->__db();
 		$label = $user != null ? 'Ubah' : 'Tambah Baru';
     $data->jumlah_binaan = Kader::where('id_pembina', $id)->count();
@@ -488,6 +494,14 @@ class KaderController extends Controller
     }
 
 		return response()->json($results);
+	}
+
+  public function getAnak($id)
+	{
+    
+		$data = Anak::where('id', $id)->first();
+
+		return response()->json($data);
 	}
 
   public function saveAnak(Request $request)

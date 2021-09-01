@@ -69,7 +69,7 @@ class Helpers
         $file->newName = time()."_".$inputs['nama_lengkap'].'.'.$file->getClientOriginalExtension();
         $file->originalName = explode('.',$file->getClientOriginalName())[0];
         // $file->move($file->path ,$file->newName);
-        Image::make($file)->resize(332, 500)->save($file->path. "/" . $file->newName);
+        Image::make($file)->resize(300, 451)->save($file->path. "/" . $file->newName);
       }
     } catch (\Exception $e){
       dd($e);
