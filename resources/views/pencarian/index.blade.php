@@ -126,6 +126,13 @@
           { 
             data:'nama_pembina',
             orderable: false,
+            render: function(data, type, full, meta){
+              console.log(!meta.settings._responsive.s.current[11])
+              if( !meta.settings._responsive.s.current[11])
+                return "<br><span>"+data+"</span>";
+              else
+                return "<span>"+data+"</span>";
+            }
           },
         ],
       });
