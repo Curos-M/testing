@@ -205,6 +205,7 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                     <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
                   </div>
                   <div class="col-md-12">
+                    <input type="hidden" name="hidden_pembina" id="hidden_pembina">
                     <select required class="form-control selectbs4" disabled style="width: 100%;" id="id_pembina" name="id_pembina"></select>
                   </div>
                   <input type="hidden" name='id_pembina' value="{{$data->id_pembina}}">
@@ -214,6 +215,7 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                 </div>
                 @else
                   <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
+                  <input type="hidden" name="hidden_pembina" id="hidden_pembina">
                   <select class="form-control selectbs4" style="width: 100%;" id="id_pembina" name="id_pembina"></select>
                 @endif
               </div>
@@ -253,6 +255,7 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                     <label for="exampleInputPassword1">Nama Pasangan</label>
                   </div>
                   <div class="col-md-10">
+                    <input type="hidden" name="hidden_pasangan" id="hidden_pasangan">
                     <select id="pasangan" style="width: 100%;" class="form-control selectbs4" name="pasangan" placeholder="Nama Pasangan" {{$data->status_pernikahan != 'Kawin' ? "disabled" : " "}}></select>
                   </div>
                   <div class="col-md-2">
@@ -261,6 +264,7 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                 </div>
               @else
                 <label for="exampleInputPassword1">Nama Pasangan</label>
+                <input type="hidden" name="hidden_pasangan" id="hidden_pasangan">
                 <select id="pasangan" style="width: 100%;" class="form-control selectbs4" name="pasangan" placeholder="Nama Pasangan" {{$data->status_pernikahan != 'Kawin' ? "disabled" : " "}}></select>
               @endif
               </div>
@@ -282,14 +286,11 @@ $verifDisabled = $data->verif ? 'disabled' : null;
           </div>
         </div>
       </div>
-    </div>
-    @if($data->id && $data->status_pernikahan != "Belum Kawin")
-    
-    <div class="container-fluid col-xl-9 offset-md-3">
-      <div class="card card-default color-pallete-box">
-        <div class="card-body">
-          <div class="form-group col-md-12">
-            <label class="mb-3" for="exampleInputPassword1">Anak</label>
+      @if($data->id && $data->status_pernikahan != "Belum Kawin")
+        <div class="card card-default color-pallete-box">
+          <div class="card-body">
+            <div class="form-group col-md-12">
+              <label class="mb-3" for="exampleInputPassword1">Anak</label>
               <br>
               <a type="button" id="add" class="btn btn-info mb-3">Tambah</a>
               <table id="anak" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
@@ -303,11 +304,12 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                   </tr>
                 </thead>
               </table>
+            </div>
           </div>
         </div>
-      </div>
+      @endif
     </div>
-    @endif
+
 </div>
 
 <div class="modal fade" id="anakModal" data-bs-backdrop="static"
@@ -507,7 +509,7 @@ $(document).ready(function (){
       type:'POST',
       url:"{{url('anak')}}/"+id,
       success: function(data){
-        var $option = $("<option selected></option>").val(data.nama).text(data.nama);
+        var $option = $("<option selected data-select2-tag='true'></option>").val(data.nama).text(data.nama);
         $('#aNama').append($option).trigger('change');
         $('#aPendidikan').val(data.pendidikan)
         $('#aTahun').val(data.tahun_lahir)
@@ -709,7 +711,8 @@ $(document).ready(function (){
   }).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();
   }).on('change', function(){
-    if($.isNumeric(this.value)){
+    let opt = this.options.selectedIndex
+    if(!$(this.options[opt]).attr('data-select2-tag') && this.options[opt].value){
       $('.divMod').addClass('d-none')
       $.ajax({
         type: "POST",
@@ -782,6 +785,13 @@ $(document).ready(function (){
     }
   }).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();
+  }).on('change', function(){
+    let opt = this.options.selectedIndex
+    if(!$(this.options[opt]).attr('data-select2-tag') && this.options[opt].value){
+      $('#hidden_pasangan').val('true')
+    }else{
+      $('#hidden_pasangan').val('false')
+    }
   });
 
   $('#id_pembina').select2({
@@ -817,7 +827,14 @@ $(document).ready(function (){
     }
   }).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();
-  });
+  }).on('change', function(){
+    let opt = this.options.selectedIndex
+    if(!$(this.options[opt]).attr('data-select2-tag') && this.options[opt].value){
+      $('#hidden_pembina').val('true')
+    }else{
+      $('#hidden_pembina').val('false')
+    }
+  });;
 
   $('#add_binaan').select2({
     theme: 'bootstrap4',
@@ -915,13 +932,16 @@ $(document).ready(function (){
   }).on('select2:open', () => {
     document.querySelector('.select2-search__field').focus();
   });
-  
+  <?php 
+    $pas = $data->pasangan ? 'data-select2-tag=true' : '';
+    $pem = $data->nama_pembinaStr ? 'data-select2-tag=true' : '';
+  ?>
   $('#kota').append("<option value={{$data->regencies_id}}>{{$data->kota}}</option>");
   $('#kecamatan').append('<option value={{$data->districts_id}}>{{$data->camat}}</option>');
   $('#desa').append('<option value={{$data->villages_id}}>{{$data->desa}}</option>');
-  $('#pasangan').append('<option value={{$data->pasangan_id??$data->pasangan}}>{{$data->nama_pasangan??$data->pasangan}}</option>');
+  $('#pasangan').append("<option {{$pas}} value={{$data->pasangan_id??$data->pasangan}}>{{$data->nama_pasangan??$data->pasangan}}</option>").trigger('change');
   $('#aNama').append('<option value=></option>');
-  $('#id_pembina').append('<option value={{$data->id_pembina??$data->nama_pembinaStr}}>{{$data->nama_pembina??$data->nama_pembinaStr}}</option>');
+  $('#id_pembina').append("<option {{$pem}} value={{$data->id_pembina??$data->nama_pembinaStr}}>{{$data->nama_pembina??$data->nama_pembinaStr}}</option>").trigger('change');
 
   $('#kota').on('change', function(){
     if(this.value){

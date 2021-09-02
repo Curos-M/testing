@@ -22,6 +22,7 @@ class Kader extends Model
       'jenis_kelamin',
       'pendidikan',
       'alamat',
+      'provinces_id',
       'regencies_id',
       'districts_id',
       'villages_id',

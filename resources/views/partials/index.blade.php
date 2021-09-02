@@ -7,8 +7,10 @@
   <title>{{env('APP_NAME')}} | {!! $title !!} </title>
 
   <link rel="stylesheet" href="{{asset('plugins/fontawesome-free/css/all.min.css')}}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
   <link rel="stylesheet" href="{{asset('dist/css/adminlte.min.css')}}">
   <link href="{{ asset('plugins/sweetalert2/sweetalert2.min.css') }}" id="app-style" rel="stylesheet" type="text/css">
+  <link rel="icon" type="image/png" href="{{url('img/PKS_logo_lte.png')}}">
   <style>
 
     .bootstrap-switch-dpd {
@@ -125,10 +127,9 @@
       vertical-align: bottom;
       border-bottom: 5px solid #fd5000;
     }
-      .table-bordered td, .table-bordered th {
+    .table-bordered td, .table-bordered th {
       border: 0px solid #dee2e6;
     }
-
     .bg-dpd {
       background-color: #fd5000!important;
     }
@@ -140,6 +141,18 @@
     }
     .main-header {
       border-bottom: 3px solid #fd5000;
+    }
+    table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control:before, table.dataTable.dtr-inline.collapsed>tbody>tr>th.dtr-control:before {
+      background-color: #fd5000 !important;
+    }
+    table.dataTable.dtr-inline.collapsed>tbody>tr.parent>td.dtr-control:before, table.dataTable.dtr-inline.collapsed>tbody>tr.parent>th.dtr-control:before {
+      background-color: #000000 !important;
+    }
+    .page-link:hover {
+      color: #cd5000;
+    }
+    .page-link {
+      color: #fd5000;
     }
 
   </style>

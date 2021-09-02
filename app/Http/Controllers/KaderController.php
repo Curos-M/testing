@@ -295,6 +295,7 @@ class KaderController extends Controller
           'jenis_kelamin' => $request->jenis_kelamin,
           'pendidikan' => $request->pendidikan,
           'alamat' => $request->alamat,
+          'provinces_id' => "15",
           'regencies_id' => $request->regencies_id,
           'districts_id' => $request->districts_id,
           'villages_id' => $request->villages_id,
@@ -325,6 +326,7 @@ class KaderController extends Controller
           'jenis_kelamin' => $request->jenis_kelamin,
           'pendidikan' => $request->pendidikan,
           'alamat' => $request->alamat,
+          'provinces_id' => "15",
           'regencies_id' => $request->regencies_id,
           'districts_id' => $request->districts_id,
           'villages_id' => $request->villages_id,
@@ -343,19 +345,20 @@ class KaderController extends Controller
         ]);
         $status = 'Berhasil menambah anggota baru.';
       }
-      if(!ctype_alpha($request->id_pembina) && $request->id_pembina != null){
+
+      if($request->hidden_pembina == "true" && $request->id_pembina != null){
         $user->update(['id_pembina' => $request->id_pembina, 'nama_pembina' => null]);
-      }elseif(ctype_alpha($request->id_pembina) && $request->id_pembina != null){
+      }elseif($request->hidden_pembina == "false"  && $request->id_pembina != null){
         $user->update(['nama_pembina' => $request->id_pembina, 'id_pembina' => null]);
       }elseif($request->id_pembina == null){
         $user->update(['nama_pembina' => null, 'id_pembina' => null]);
       }
 
-      if(!ctype_alpha($request->pasangan) && $request->pasangan != null){
+      if($request->hidden_pasangan == "true"  && $request->pasangan != null){
         $user->update(['pasangan_id' => $request->pasangan, 'pasangan' => null]);
         Kader::where('pasangan_id' ,$user->id)->update(['pasangan_id' => null]);
         Kader::find($request->pasangan)->update(['pasangan' => null, 'pasangan_id' => $user->id]);
-      }elseif(ctype_alpha($request->pasangan) && $request->pasangan != null){
+      }elseif($request->hidden_pasangan == "false"  && $request->pasangan != null){
         $user->update(['pasangan' => $request->pasangan, 'pasangan_id' => null]);
         Kader::where('pasangan_id' ,$user->id)->update(['pasangan_id' => null]);
       }elseif($request->pasangan == null){

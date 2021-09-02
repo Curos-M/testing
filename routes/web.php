@@ -10,6 +10,7 @@ use App\Http\Controllers\RegistrasiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VerifController;
 use App\Http\Controllers\KelompokController;
+use App\Http\Controllers\PencarianController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,6 +35,7 @@ Route::get('/village',  [AlamatController::class, 'village']);
 
 Route::group(['middleware' => 'auth'], function() {
   Route::get('/',  [DashboardController::class, 'index']);	
+  Route::post('/grid',  [DashboardController::class, 'grid']);	
 
   Route::get('/user',  [UserController::class, 'index'])->middleware('can:user-view');	
 	Route::get('/user/edit/{id?}',  [UserController::class, 'edit'])->middleware('can:user-view');	
@@ -72,5 +74,8 @@ Route::group(['middleware' => 'auth'], function() {
   Route::post('/verifikasi/view/{id}',  [VerifController::class, 'view']);	
 
   Route::get('/kelompok',  [KelompokController::class, 'index']);
+
+  Route::get('/pencarian',  [PencarianController::class, 'index']);
+  Route::get('/pencarian/grid',  [PencarianController::class, 'grid']);
   
 });

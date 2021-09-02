@@ -46,7 +46,7 @@ class Helpers
         }
         $tumbPath = $file->path .'/'. 'thumbnail/';
         $img = Image::make($file);
-        $img->resize(332, 500)->save($tumbPath . "/" . $file->newName);
+        $img->resize(332, 500)->orientate()->save($tumbPath . "/" . $file->newName);
       }
     } catch (\Exception $e){
       dd($e);
@@ -69,7 +69,7 @@ class Helpers
         $file->newName = time()."_".$inputs['nama_lengkap'].'.'.$file->getClientOriginalExtension();
         $file->originalName = explode('.',$file->getClientOriginalName())[0];
         // $file->move($file->path ,$file->newName);
-        Image::make($file)->resize(300, 451)->save($file->path. "/" . $file->newName);
+        Image::make($file)->orientate()->resize(300, 400)->save($file->path. "/" . $file->newName);
       }
     } catch (\Exception $e){
       dd($e);
@@ -92,7 +92,7 @@ class Helpers
         $file->newName = time()."_".$inputs['nama_lengkap'].'.'.$file->getClientOriginalExtension();
         $file->originalName = explode('.',$file->getClientOriginalName())[0];
         // $file->move($file->path ,$file->newName);
-        Image::make($file)->resize(300, 199)->save($file->path. "/" . $file->newName);
+        Image::make($file)->orientate()->resize(300, 225)->save($file->path. "/" . $file->newName);
 
       }
     } catch (\Exception $e){

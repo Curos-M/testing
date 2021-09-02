@@ -57,6 +57,7 @@ class RegistrasiController extends Controller
           'jenis_kelamin' => $request->jenis_kelamin,
           'pendidikan' => $request->pendidikan,
           'alamat' => $request->alamat,
+          'provinces_id' => "15",
           'regencies_id' => $request->regencies_id,
           'districts_id' => $request->districts_id,
           'villages_id' => $request->villages_id,

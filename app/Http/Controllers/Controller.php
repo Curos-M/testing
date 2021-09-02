@@ -69,7 +69,7 @@ class Controller extends BaseController
         'title'       => $this->title,
         'link'				=> $this->url,
         'header'      => $this->header,
-        'username'    => Auth::user()->username,
+        'username'    => Auth::user()->full_name,
         'canEdit'     => Auth::user()->can($this->url.'-edit'),
         'canAdd'      => Auth::user()->can($this->url.'-add'),
         'canDelete'   => Auth::user()->can($this->url.'-delete')

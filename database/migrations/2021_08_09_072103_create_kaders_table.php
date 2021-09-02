@@ -27,6 +27,7 @@ class CreateKadersTable extends Migration
             $table->boolean('jenis_kelamin');
             $table->string('pendidikan');
             $table->string('alamat');
+            $table->bigInteger('provinces_id');
             $table->bigInteger('regencies_id');
             $table->bigInteger('districts_id');
             $table->bigInteger('villages_id');

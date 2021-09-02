@@ -32,8 +32,7 @@
       },
       dom: '<"row"' +
         '<"col-md-12"<"row"<"col-md-6"B><"col-md-6"f> > >' +
-        '<"col-md-12"t> <"col-md-12"<"row"<"col-md-5"i><"col-md-7"p>>> >'+
-        '<"col-md-12"r>',
+        '<"col-md-12"tr> <"col-md-12"<"row"<"col-md-5"i><"col-md-7"p>>> >',
       buttons: [
         { 
           text: "Tambah Baru",
