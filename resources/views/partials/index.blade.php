@@ -41,6 +41,16 @@
       box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(253, 80, 0, 0.6) !important;
       outline: 0 none !important;
     }
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+/* Firefox */
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
     .select2-container--bootstrap4 .select2-results__option--highlighted, .select2-container--bootstrap4 .select2-results__option--highlighted.select2-results__option[aria-selected="true"] {
       color: #fff;
       background-color: #FD5000 !important;
@@ -153,6 +163,9 @@
     }
     .page-link {
       color: #fd5000;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: #fd500012;
     }
 
   </style>

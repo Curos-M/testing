@@ -51,7 +51,7 @@
             </li>
             <li class="nav-item">
               <a href="{{url('/anggota')}}" class="nav-link {{$active->master['anggota']}}">
-                <i class="fas fa-users nav-icon orange"></i>
+                <i class="fas fa-id-card nav-icon orange"></i>
                 <p>Anggota</p>
               </a>
             </li>

@@ -2,6 +2,7 @@
 <?php 
 $read = isset($data->id) ? 'readonly' : null;
 $disabled = isset($data->id) ? 'disabled' : null;
+$notDisabled = !isset($data->id) ? 'disabled' : null;
 $verifRead = $data->verif ? 'readonly' : null;
 $verifDisabled = $data->verif ? 'disabled' : null;
  ?>  
@@ -188,10 +189,10 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                     <select {{$verifDisabled}} required class="form-control selectbs4" style="width: 100%;" name="regencies_id" id="kota"></select>
                   </div>
                   <div class="col-md-4">    
-                    <select required class="form-control selectbs4" style="width: 100%;" name="districts_id"  id="kecamatan"></select>
+                    <select required {{$notDisabled}} class="form-control selectbs4" style="width: 100%;" name="districts_id"  id="kecamatan"></select>
                   </div>
                   <div class="col-md-4 mb-3">    
-                    <select required class="form-control selectbs4" style="width: 100%;" id="desa" name="villages_id"></select>
+                    <select required {{$notDisabled}} class="form-control selectbs4" style="width: 100%;" id="desa" name="villages_id"></select>
                   </div>
                   <div class="col-md-12">    
                     <textarea required type="text" class="form-control"name="alamat" placeholder="Alamat">{{old('alamat', $data->alamat)}}</textarea>
