@@ -103,12 +103,14 @@ class KaderController extends Controller
   public function pembina(Request $request)
 	{
 		$data = Kader::where('nama_lengkap', 'LIKE', '%'. $request->search . '%')
-    ->where('pembina', '1')->where('verif', '1')
-    ->where('jenjang_anggota', '>', $request->jenjang);
+    ->where('pembina', '1')->where('verif', '1');
+    if($request->jenjang){
+      $data->where('jenjang_anggota', '>', $request->jenjang);
+    } 
     if($request->id && $request->ortu){
       $data = $data->whereNotIn('id', [$request->id]);
     }
-    $data= $data->take(5)->get();
+    $data = $data->take(5)->get();
 		return response()->json($data);
 	}
 
@@ -219,7 +221,7 @@ class KaderController extends Controller
       'kader.id_pembina',
       'u.full_name as verif_user',
       DB::Raw("to_char(kader.verif_at, 'dd-mm-yyyy hh24:mi:ss')as verif_date")
-      )->findOrFail($id);
+      )->find($id);
 		$data = $user != null ? $user : $this->__db();
 		$label = $user != null ? 'Ubah' : 'Tambah Baru';
     $data->jumlah_binaan = Kader::where('id_pembina', $id)->count();
