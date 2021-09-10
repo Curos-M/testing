@@ -988,61 +988,8 @@ $(document).ready(function (){
     }
   })
 
-  
-
-  var id = $('#kota').val()  
-  $('#kecamatan').select2({
-    theme: 'bootstrap4',
-    allowClear: true,
-    placeholder: 'Kecamatan',
-    width: 'resolve',
-    minimumResultsForSearch: Infinity,
-    ajax: {
-      url: "{{url('district')}}",
-      dataType: 'json',
-      data:{regency_id : id },
-      delay: 250,
-      processResults: function (data) {
-        return {
-          results:  $.map(data, function (item) {
-            return {
-              text: item.name,
-              id: item.id
-            }
-          })
-        };
-      },
-      cache: false,
-    }
-  })
-
-  var id2 = $('#kecamatan').val() 
-  $('#desa').select2({
-    theme: 'bootstrap4',
-    allowClear: true,
-    placeholder: 'Desa/Kelurahan',
-    width: 'resolve',
-    minimumResultsForSearch: Infinity,
-    ajax: {
-      url: "{{url('village')}}",
-      dataType: 'json',
-      data:{district_id : id2},
-      delay: 250,
-      processResults: function (data) {
-        console.log(data)
-        return {
-          results:  $.map(data, function (item) {
-            return {
-              text: item.name,
-              id: item.id
-            }
-          })
-        };
-      },
-      cache: false,
-    }
-  })
-  
+  camat()
+  desa()
 });
 
 window.addEventListener("fileUploadWithPreview:imagesAdded", function (e) { 

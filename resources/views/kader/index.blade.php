@@ -53,16 +53,19 @@
           },
           { 
             data: 'nama_jenjang',
+            orderable: false,
             searchable: false
           },
           { 
             data: 'telp',
+            orderable: false,
             searchable: false
           },
           @if($canEdit || $canDelete)
           { 
             data:null,
             searchable: false,
+            orderable: false,
             width:'80px',
             className: 'text-center',
             render: function(data, type, full, meta){

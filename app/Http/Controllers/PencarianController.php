@@ -17,19 +17,68 @@ class PencarianController extends Controller
   public function index()
 	{
 		$this->setBreadcrumb(['Pencarian' => '#']);
-    
-		return $this->render('pencarian.index');
+    $jenjang = DB::table('jenjang')->get();
+		return $this->render('pencarian.index', ['jenjang' => $jenjang]);
 	}
 
-  public function grid()
+  public function grid(Request $request)
 	{
-		$data = Kader::where('kader.verif', '1')
+		$kader = Kader::where('kader.verif', '1')
     ->leftJoin('_regencies as r', 'kader.regencies_id', '=', 'r.id')
     ->leftJoin('_districts as d', 'kader.districts_id', '=', 'd.id')
     ->leftJoin('_villages as v', 'kader.villages_id', '=', 'v.id')
     ->leftJoin('jenjang as j', 'kader.jenjang_anggota', '=', 'j.id')
-    ->leftJoin('kader as p', 'kader.id_pembina', '=', 'p.id')
-    ->select([
+    ->leftJoin('kader as p', 'kader.id_pembina', '=', 'p.id');
+    if($request->search){
+      if($request->type == 1)
+        $kader->where(DB::raw("lower(kader.nama_lengkap)"), "like", DB::raw("lower('%".$request->search."%')"));
+      if($request->type == 2)
+        $kader->where(DB::raw("lower(kader.nomor_urut)"), "like", DB::raw("lower('%".$request->search."%')"));
+      if($request->type == 3)
+        $kader->where(DB::raw("lower(kader.nik)"), "like", DB::raw("lower('%".$request->search."%')"));
+    }
+    if($request->darah){
+      $kader->where('kader.darah', $request->darah);
+    }
+    if($request->jenjang){
+      $kader->where('kader.jenjang_anggota', $request->jenjang);
+    }
+    if($request->kota){
+      $kader->where('kader.regencies_id', $request->kota);
+    }
+    if($request->kecamatan){
+      $kader->where('kader.districts_id', $request->kecamatan);
+    }
+    if($request->desa){
+      $kader->where('kader.villages_id', $request->desa);
+    }
+    if($request->pembina){
+      $kader->where('kader.id_pembina', $request->pembina);
+    }
+    switch($request->umur){
+      case 1:
+        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) < '20'");
+        break;
+      case 2:
+        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '20' and date_part('year', age(now() , kader.tanggal_lahir)) < '30'");
+        break;
+      case 3: 
+        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '30' and date_part('year', age(now() , kader.tanggal_lahir)) < '40'");
+        break;
+      case 4:
+        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '40' and date_part('year', age(now() , kader.tanggal_lahir)) < '50'");
+        break;
+      case 5:
+        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '50' and date_part('year', age(now() , kader.tanggal_lahir)) < '60'");
+        break;
+      case 6:
+        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '60' and date_part('year', age(now() , kader.tanggal_lahir)) < '70'");
+        break;
+      case 7:
+        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '70'");
+        break;    
+    }
+    $data = $kader->select([
       'kader.id',
       'kader.photo',
       'kader.nomor_urut',
@@ -53,10 +102,6 @@ class PencarianController extends Controller
       'kader.pendidikan'
     ]);
 
-		return datatables()->eloquent($data)->orderColumn('nama_lengkap', function($query, $order){
-      $query->orderBy('nama_lengkap', $order);
-    })->orderColumn('tggl_daftar', function($query, $order){
-      $query->orderBy('created_at', $order);
-    })->toJson();
+		return datatables()->of($data)->toJson();
 	}
 }

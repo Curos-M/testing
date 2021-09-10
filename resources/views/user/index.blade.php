@@ -44,6 +44,7 @@
           { 
             data:null,
             width:'80px',
+            orderable: false,
             className: 'text-center',
             render: function(data, type, full, meta){
               let icon = "";

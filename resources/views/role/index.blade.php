@@ -40,6 +40,7 @@
           @if($canEdit || $canDelete)
           { 
             data:null,
+            orderable: false,
             width:'80px',
             className: 'text-center',
             render: function(data, type, full, meta){
