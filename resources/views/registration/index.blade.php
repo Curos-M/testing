@@ -177,6 +177,8 @@
                         <option {{old('pendidikan') == 'SLTA' ?'selected': ''}}>SLTA</option>
                         <option {{old('pendidikan') == 'D1/D2/D3' ?'selected': ''}}>D1/D2/D3</option>
                         <option {{old('pendidikan') == 'S1' ?'selected': ''}}>S1</option>
+                        <option {{old('pendidikan') == 'S2' ?'selected': ''}}>S2</option>
+                        <option {{old('pendidikan') == 'S3' ?'selected': ''}}>S3</option>
                       </select>
                     </div>
                     <div class="form-group col-md-6">
@@ -213,7 +215,11 @@
                           <textarea required type="text" class="form-control"name="alamat" placeholder="Alamat">{{old('alamat')}}</textarea>
                         </div>
                       </div>
-                    </div>               
+                    </div>      
+                    <div class="form-group col-md-12">
+                      <label for="exampleInputPassword1">Direkomendasikan Oleh</label>
+                      <input required type="text" class="form-control" value="{{old('rekomendasi')}}" name="rekomendasi" placeholder="Direkomendasikan oleh (Opsional)">
+                    </div>         
                     <div class="custom-file-container col-md-6 form-group" data-upload-id="myFirstImage1">
                       <label>Foto KTP <a href="javascript:void(0)" class="custom-file-container__image-clear" id="imgKtp" style="color: #FD5000;" title="Clear Image">&nbsp;&times;</a></label>
                       <label class="custom-file-container__custom-file mb-3 mt-1" >

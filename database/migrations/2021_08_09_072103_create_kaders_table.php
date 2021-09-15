@@ -37,7 +37,7 @@ class CreateKadersTable extends Migration
             $table->bigInteger('jenjang_anggota');
             $table->date('usia_jenjang');
             $table->boolean('pembina');
-            $table->bigInteger('id_pembina')->nullable();
+            $table->bigInteger('id_kelompok')->nullable();
             $table->string('nama_pembina')->nullable();
             $table->bigInteger('pasangan_id')->nullable();
             $table->string('pasangan')->nullable();
@@ -48,6 +48,7 @@ class CreateKadersTable extends Migration
             $table->boolean('verif');
             $table->dateTime('verif_at')->nullable();
             $table->bigInteger('verif_by')->nullable();
+            $table->string('rekomendasi')->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->bigInteger('created_by');

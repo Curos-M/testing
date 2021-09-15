@@ -34,6 +34,7 @@ class Kader extends Model
       'pembina',
       'nama_pembina',
       'id_pembina',
+      'id_kelompok',
       'pasangan',
       'pasangan_id',
       'status_pernikahan',
@@ -43,6 +44,7 @@ class Kader extends Model
       'verif_at',
       'verif_by',
       'ortu_id',
+      'rekomendasi',
       'created_by',
       'updated_by',
       'deleted_by'

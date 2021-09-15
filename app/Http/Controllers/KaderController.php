@@ -216,6 +216,7 @@ class KaderController extends Controller
       'kader.pembina',
       'kader.verif',
       'kader.nama_pembina as nama_pembinaStr',
+      'kader.rekomendasi',
       'p.nama_lengkap as nama_pasangan',
       'b.nama_lengkap as nama_pembina',
       'kader.id_pembina',

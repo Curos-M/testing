@@ -69,6 +69,7 @@ class RegistrasiController extends Controller
           'status_pernikahan' => 'Belum Kawin',
           'jenjang_anggota' => "1",
           'darah' => $request->darah,
+          'rekomendasi' => $request->rekomendasi,
           'ktp' => $file1->newName??null,
           'verif' => '0',
           'created_by' => '0'

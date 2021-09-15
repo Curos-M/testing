@@ -93,7 +93,8 @@ class VerifController extends Controller
       'job',
       'darah',
       'photo',
-      'ktp'
+      'ktp',
+      DB::raw("CASE WHEN rekomendasi is null THEN '-' ELSE rekomendasi END as rekomendasi")
     ])
     ->first();
 

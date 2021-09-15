@@ -9,66 +9,76 @@
 <div class="container-fluid">
   <div class="card card-default color-palette-box">
     <div class="card-body">
-      <div class="row">
-        <div class="col-sm-4">
-          <select class="form-control selectbs4 form-control-sm" style="width: 100%;" name="regencies_id" id="kota"></select>
-        </div>
-        <div class="col-sm-4">
-          <select disabled class="form-control selectbs4 form-control-sm" style="width: 100%;" name="districts_id"  id="kecamatan"></select>
-        </div>
-        <div class="col-sm-4">
-          <select disabled class="form-control selectbs4 form-control-sm" style="width: 100%;" id="desa" name="villages_id"></select>
-        </div>
-      </div>
-      <div class="row mt-2">
-        <div class="col-sm-3">
-          <input disabled id="search" type="text" class="form-control form-control-sm" placeholder="Cari">
-        </div>
-        <div class="col-sm-2">
-          <select id="type" class="form-control form-control-sm">
-            <option value="0">Pilih....</option>
-            <option value="1">Nama Lengkap</option>
-            <option value="2">Nomor Anggota</option>
-            <option value="3">NIK</option>
-          </select>
+      <div class="col-12">
+        <div class="row">
+          <div class="col-sm-4">
+            <select class="form-control selectbs4 form-control-sm" style="width: 100%;" name="regencies_id" id="kota"></select>
+          </div>
+          <div class="col-sm-4">
+            <select disabled class="form-control selectbs4 form-control-sm" style="width: 100%;" name="districts_id"  id="kecamatan"></select>
+          </div>
+          <div class="col-sm-4">
+            <select disabled class="form-control selectbs4 form-control-sm" style="width: 100%;" id="desa" name="villages_id"></select>
+          </div>
         </div>
       </div>
-      <div class="row mt-2">
-        <div class="col-sm-3">
-          <select id="jenjang" class="form-control form-control-sm extra">
-            <option value="0">Semua Jenjang</option>
-            @foreach ($jenjang as $j )
-              <option value="{{$j->id}}">{{$j->nama}}</option>
-            @endforeach
-          </select>
-        </div>
-        <div class="col-sm-3">
-          <select id="darah" class="form-control form-control-sm ekstra">
-            <option value="0">Semua Golongan Darah</option>
-            <option>A</option>
-            <option>B</option>
-            <option>AB</option>
-            <option>O</option>
-          </select>
+      <div class="col-12 mt-2">
+        <div class="row">
+          <div class="col-sm-3">
+            <input disabled id="search" type="text" class="form-control form-control-sm" placeholder="Cari">
+          </div>
+          <div class="col-sm-2">
+            <select id="type" class="form-control form-control-sm">
+              <option value="0">Pilih....</option>
+              <option value="1">Nama Lengkap</option>
+              <option value="2">Nomor Anggota</option>
+              <option value="3">NIK</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div class="row mt-2">
-        <div class="col-sm-6">
-          <select class="form-control selectbs4" style="width: 100%;" id="pembina"></select>
+      <div class="col-12 mt-2">
+        <div class="row">
+          <div class="col-sm-3">
+            <select id="jenjang" class="form-control form-control-sm extra">
+              <option value="0">Semua Jenjang</option>
+              @foreach ($jenjang as $j )
+                <option value="{{$j->id}}">{{$j->nama}}</option>
+              @endforeach
+            </select>
+          </div>
+          <div class="col-sm-3">
+            <select id="darah" class="form-control form-control-sm ekstra">
+              <option value="0">Semua Golongan Darah</option>
+              <option>A</option>
+              <option>B</option>
+              <option>AB</option>
+              <option>O</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div class="row mt-2">
-        <div class="col-sm-6">
-          <select id="umur" class="form-control form-control-sm ekstra">
-            <option value="0">Semua Usia</option>
-            <option value="1">Dibawah 20</option>
-            <option value="2">20-29</option>
-            <option value="3">30-39</option>
-            <option value="4">40-49</option>
-            <option value="5">50-59</option>
-            <option value="6">60-69</option>
-            <option value="7">70 Keatas</option>
-          </select>
+      <div class="col-12 mt-2">
+        <div class="row">
+          <div class="col-sm-6">
+            <select class="form-control selectbs4" style="width: 100%;" id="pembina"></select>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 mt-2">
+        <div class="row">
+          <div class="col-sm-6">
+            <select id="umur" class="form-control form-control-sm ekstra">
+              <option value="0">Semua Usia</option>
+              <option value="1">Dibawah 20</option>
+              <option value="2">20-29</option>
+              <option value="3">30-39</option>
+              <option value="4">40-49</option>
+              <option value="5">50-59</option>
+              <option value="6">60-69</option>
+              <option value="7">70 Keatas</option>
+            </select>
+          </div>
         </div>
       </div>
       <div class="col-12 mt-2">

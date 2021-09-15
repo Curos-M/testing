@@ -1,4 +1,4 @@
-<aside class="main-sidebar sidebar-light-orange elevation-2">
+<aside class="main-sidebar sidebar-light-orange elevation-1">
   <a href="{{url('/')}}" class="brand-link">
     <img src="{{asset('img/PKS_logo_lte.png')}}" alt="AdminLTE Logo" class="img-circle brand-image">
     <span class="brand-text font-weight-bolder">PKS</span>

@@ -39,16 +39,16 @@
     </div>
     <div class="card">
       <div class="card-header">
-        <h3 class="card-title">Jenjang Keanggotaan</h3>
+        <h3 class="card-title">Sebaran Domisili</h3>
         <div class="card-tools">
           <button type="button" class="btn btn-tool" data-card-widget="collapse">
             <i class="fas fa-window-minimize"></i>
           </button>
         </div>
       </div>
-        <div class="card-body">
-          <canvas id="jenjang" style="min-height: 443px; height: 443px; max-height: 443px; max-width: 100%;"></canvas>
-        </div>
+      <div class="card-body">
+        <canvas id="domisili" style="min-height: 443px; height: 443px; max-height: 443px; max-width: 100%;"></canvas>
+      </div>
     </div>
   </div>
   <div class="col-md-4">
@@ -61,9 +61,22 @@
           </button>
         </div>
       </div>
-        <div class="card-body">
-          <canvas id="usia" style="min-height: 250px; height: 400px; max-height: 500px; max-width: 100%;"></canvas>
+      <div class="card-body">
+        <canvas id="usia" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Jenjang</h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+            <i class="fas fa-window-minimize"></i>
+          </button>
         </div>
+      </div>
+      <div class="card-body">
+        <canvas id="jenjang" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+      </div>
     </div>
   </div>
   <div class="col-md-3">
@@ -76,9 +89,9 @@
           </button>
         </div>
       </div>
-        <div class="card-body">
-          <canvas id="gender" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-        </div>
+      <div class="card-body">
+        <canvas id="gender" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+      </div>
     </div>
     <div class="card">
       <div class="card-header">
@@ -89,9 +102,9 @@
           </button>
         </div>
       </div>
-        <div class="card-body">
-          <canvas id="darah" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-        </div>
+      <div class="card-body">
+        <canvas id="darah" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+      </div>
     </div>
   </div>
 </div>
@@ -160,7 +173,7 @@
     })
   }
   $(document).ready(function (){
-    let gender, darah, usia, jenjang
+    let gender, darah, usia, jenjang, domisili
     function call()
     {
       $.ajax({
@@ -248,6 +261,18 @@
               legend: {
                 display: false
               },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true,
+                    userCallback: function(label, index, labels) {
+                      if (Math.floor(label) === label) {
+                        return label;
+                      }
+                    },
+                  }
+                }]
+              },
               tooltips: {
                 callbacks: {
                   label: function(tooltipItem) {
@@ -287,6 +312,63 @@
               legend: {
                 display: false
               },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true,
+                    userCallback: function(label, index, labels) {
+                      if (Math.floor(label) === label) {
+                        return label;
+                      }
+                    },
+                  }
+                }]
+              },
+              tooltips: {
+                callbacks: {
+                  label: function(tooltipItem) {
+                    return tooltipItem.yLabel;
+                  }
+                }
+              }
+            }
+          })
+          domisili = new Chart($('#domisili').get(0).getContext('2d'), {
+            type: 'bar',
+            data: {
+              labels  : data.namaDomisili,
+              datasets: [
+                {
+                  backgroundColor     : '#fd5000',
+                  borderColor         : 'rgba(210, 214, 222, 1)',
+                  pointRadius         : false,
+                  pointColor          : 'rgba(210, 214, 222, 1)',
+                  pointStrokeColor    : '#c1c7d1',
+                  pointHighlightFill  : '#fff',
+                  pointHighlightStroke: 'rgba(220,220,220,1)',
+                  data                : data.sumDomisili
+                },
+              ]
+            },
+            options: {
+              responsive              : true,
+              maintainAspectRatio     : false,
+              datasetFill             : false,
+              legend: {
+                display: false
+              },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true,
+                    userCallback: function(label, index, labels) {
+                      if (Math.floor(label) === label) {
+                        return label;
+                      }
+                    },
+                  }
+                }]
+              },
               tooltips: {
                 callbacks: {
                   label: function(tooltipItem) {
@@ -310,7 +392,7 @@
         $('#kecamatan').attr('disabled', true)
         $('#desa').attr('disabled', true)
       }
-      destroyChart(gender, usia ,jenjang ,darah)
+      destroyChart(gender, usia ,jenjang ,darah, domisili)
       call()
       camat()
       desa()
@@ -323,20 +405,21 @@
         $('#desa').attr('disabled', true)
         $('#desa').val('')
       }
-      destroyChart(gender, usia ,jenjang ,darah)
+      destroyChart(gender, usia ,jenjang ,darah, domisili)
       call()
       desa()
     })
     $('#desa').on('change', function(){
-      destroyChart(gender, usia ,jenjang ,darah)
+      destroyChart(gender, usia ,jenjang ,darah, domisili)
       call()
     })
-    function destroyChart(a, b, c, d)
+    function destroyChart(a, b, c, d, e)
     {
         a.destroy()
         b.destroy()
         c.destroy()
         d.destroy()
+        e.destroy()
     }
     $('#kota').select2({
       theme: 'bootstrap4',

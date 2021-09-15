@@ -141,7 +141,8 @@
                 "<strong class='col-12'>Jenis Kelamin"+"</strong><span class='col-md-12 mb-3'> "+data.jenis_kelamin_raw+"</span>"+
                 "<strong class='col-12'>Nomor HP"+"</strong><span class='col-md-12 mb-3'> "+data.telp+"</span>"+
                 "<strong class='col-12'>Alamat"+"</strong><span class='col-md-12 mb-3'> "+data.alamat+" "+data.villages_name+", "+data.districts_name+", "+data.regencies_name+"</span>"+
-                "<strong class='col-12'>Golongan Darah"+"</strong><span class='col-md-12'> "+data.darah+"</span>"
+                "<strong class='col-12'>Golongan Darah"+"</strong><span class='col-md-12 mb-3'> "+data.darah+"</span>"+
+                "<strong class='col-12'>Direkomendasikan Oleh"+"</strong><span class='col-md-12'> "+data.rekomendasi+"</span>"
                 if(data.ktp){
                   body +=
                   '<div class="col-md-12 mt-3">'+
@@ -170,7 +171,8 @@
                 "<span class='col-md-4 mb-3'>Jenis Kelamin"+"</span><span>:</span><span class='col-md-7'> "+data.jenis_kelamin_raw+"</span>"+
                 "<span class='col-md-4 mb-3'>Nomor HP"+"</span><span>:</span><span class='col-md-7'> "+data.telp+"</span>"+
                 "<span class='col-md-4 mb-3'>Alamat"+"</span><span>:</span><span class='col-md-7'> "+data.alamat+" "+data.villages_name+", "+data.districts_name+", "+data.regencies_name+"</span>"+
-                "<span class='col-md-4'>Golongan Darah"+"</span><span>:</span><span class='col-md-7'> "+data.darah+"</span>"
+                "<span class='col-md-4 mb-3'>Golongan Darah"+"</span><span>:</span><span class='col-md-7'> "+data.darah+"</span>"+
+                "<span class='col-md-4'>Direkomendasikan Oleh"+"</span><span>:</span><span class='col-md-7'> "+data.rekomendasi+"</span>"
                 if(data.ktp){
                   body +=
                   '<div class="col-md-6 mt-3">'+

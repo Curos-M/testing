@@ -25,26 +25,33 @@ $verifDisabled = $data->verif ? 'disabled' : null;
 
 @section('content-form')
 <div class="row">
-  @if ($data->verif_user)
+  @if ($data->verif_user || $data->rekomendasi)
     <div class="col-xl-12">
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">Riwayat</h3>
           <div class="card-tools">
-            <button type="button" class="btn btn-tool" aria-controls="riwayat" data-toggle="collapse" aria-expanded="false" data-target="#riwayat" title="Collapse">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
               <i class="fas fa-window-minimize"></i>
             </button>
           </div>
         </div>
-        <div class="collapse" id="riwayat">
-          <div class="card-body">
-            <div class="row">
+        <div class="card-body">
+          <div class="row">
+            @if($data->verif_user)
               <div class="col-6">
                 <span class="text-muted">Diverifikasi Oleh :</span>
                 <br>
                 <span class="font-weight-normal">&nbsp;{{$data->verif_user}} - {{$data->verif_date}}</span>
               </div>
-            </div>
+            @endif
+            @if($data->rekomendasi)
+              <div class="col-6">
+                <span class="text-muted">Direkomendasikan Oleh :</span>
+                <br>
+                <span class="font-weight-normal">&nbsp;{{$data->rekomendasi}}</span>
+              </div>
+            @endif
           </div>
         </div>
       </div>
@@ -162,6 +169,8 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                   <option {{old('pendidikan', $data->pendidikan) == 'SLTA' ?'selected': ''}}>SLTA</option>
                   <option {{old('pendidikan', $data->pendidikan) == 'D1/D2/D3' ?'selected': ''}}>D1/D2/D3</option>
                   <option {{old('pendidikan', $data->pendidikan) == 'S1' ?'selected': ''}}>S1</option>
+                  <option {{old('pendidikan', $data->pendidikan) == 'S2' ?'selected': ''}}>S2</option>
+                  <option {{old('pendidikan', $data->pendidikan) == 'S3' ?'selected': ''}}>S3</option>
                 </select>
               </div>
               <div class="form-group col-md-6">
@@ -275,7 +284,7 @@ $verifDisabled = $data->verif ? 'disabled' : null;
               </div>
             </div>
             <button type="submit" id="subForm" class="btn btn-dpd float-right ml-2 mt-3">Simpan</button>
-            <a href="{{ url('/'.$link) }}" type="button" class="btn btn-black float-right mt-3">{{ isset($data->id) ? 'Kembali' : 'Batal' }}</a>
+            <a href="{{ url()->previous() == url()->current() ? url('/'.$link) : url()->previous()}}" type="button" class="btn btn-black float-right mt-3">{{ isset($data->id) ? 'Kembali' : 'Batal' }}</a>
   </form>
             @if (!$data->verif && $data->id)
               <form method="POST" action="{{ url('/anggota/verif').'/'.$data->id }}">
