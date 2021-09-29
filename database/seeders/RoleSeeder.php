@@ -18,9 +18,14 @@ class RoleSeeder extends Seeder
     {
         $data_role = [
             [
-                'name'       => 'Administrator',
-                'guard_name' => 'web',
-                'created_at' => \Carbon\Carbon::now(),
+              'name'       => 'Administrator',
+              'guard_name' => 'web',
+              'created_at' => \Carbon\Carbon::now(),
+            ],
+            [
+              'name'       => 'testing',
+              'guard_name' => 'web',
+              'created_at' => \Carbon\Carbon::now(),
             ]
         ];
         Role::truncate();
@@ -32,7 +37,7 @@ class RoleSeeder extends Seeder
         $role_first = Role::first();
 
         $permissions = [
-    		[
+    		    [
                 'name'       => 'dashboard',
                 'guard_name' => 'web',
                 'action'     => ['view'],
@@ -42,7 +47,7 @@ class RoleSeeder extends Seeder
                 'guard_name' => 'web',
                 'action'     => ['view', 'add', 'edit', 'delete'],
             ],
-    		[
+    		    [
                 'name'       => 'role',
                 'guard_name' => 'web',
                 'action'     => ['view', 'add', 'edit', 'delete'],
@@ -58,10 +63,15 @@ class RoleSeeder extends Seeder
                 'action'     => ['view', 'add', 'edit', 'delete'],
             ],
             [
-                'name'       => 'cari',
+                'name'       => 'pencarian',
                 'guard_name' => 'web',
                 'action'     => ['view'],
             ],
+            [
+              'name'       => 'Kelompok',
+              'guard_name' => 'web',
+              'action'     => ['view'],
+          ],
         ];
         Permission::truncate();
         foreach ($permissions as $row) {
