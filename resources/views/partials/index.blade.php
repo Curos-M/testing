@@ -232,7 +232,7 @@
         <button type="button" class="btn btn-danger d-none modal-action-delete font-bold"><i class="ti-trash"></i>Hapus</button>
         <button type="button" class="btn btn-info d-none modal-action-ok font-bold" data-dismiss="modal">Ok</button>
         <button type="button" class="btn btn-success d-none modal-action-save font-bold">Simpan</button>
-        <button type="button" class="btn btn-dpd d-none font-bold">Edit</button>
+        <button id="dpdModal" type="button" class="btn btn-dpd d-none font-bold">Edit</button>
         <!-- <button type="button" class="btn btn-primary">Understood</button> -->
       </div>
     </div>

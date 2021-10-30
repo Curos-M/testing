@@ -68,9 +68,9 @@ class RoleSeeder extends Seeder
                 'action'     => ['view'],
             ],
             [
-              'name'       => 'Kelompok',
+              'name'       => 'kelompok',
               'guard_name' => 'web',
-              'action'     => ['view'],
+              'action'     => ['view', 'add', 'edit', 'delete'],
           ],
         ];
         Permission::truncate();

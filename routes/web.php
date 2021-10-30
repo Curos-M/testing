@@ -74,6 +74,11 @@ Route::group(['middleware' => 'auth'], function() {
   Route::post('/verifikasi/view/{id}',  [VerifController::class, 'view']);	
 
   Route::get('/kelompok',  [KelompokController::class, 'index']);
+  Route::get('/kelompok/grid',  [KelompokController::class, 'grid']);
+  Route::get('/kelompok/edit/{id?}',  [KelompokController::class, 'edit']);
+  Route::post('/kelompok/view/{id?}',  [KelompokController::class, 'lihat']);
+  Route::post('/kelompok',  [KelompokController::class, 'save']);
+  Route::delete('/kelompok/{id}',  [KelompokController::class, 'delete']);
 
   Route::get('/pencarian',  [PencarianController::class, 'index']);
   Route::get('/pencarian/grid',  [PencarianController::class, 'grid']);

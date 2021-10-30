@@ -524,7 +524,7 @@ $(document).ready(function (){
         $('#aPendidikan').val(data.pendidikan)
         $('#aTahun').val(data.tahun_lahir)
         $('#aId').val(data.id)
-        if(data.tarbiyah == 'Ya'){
+        if(data.tarbiyah == true){
           $('#Radio3').prop('checked', true);
         }else{
           $('#Radio4').prop('checked', true);
