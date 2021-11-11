@@ -28,7 +28,8 @@ class PencarianController extends Controller
     ->leftJoin('_districts as d', 'kader.districts_id', '=', 'd.id')
     ->leftJoin('_villages as v', 'kader.villages_id', '=', 'v.id')
     ->leftJoin('jenjang as j', 'kader.jenjang_anggota', '=', 'j.id')
-    ->leftJoin('kader as p', 'kader.id_pembina', '=', 'p.id');
+    ->leftJoin('kelompok as k', 'kader.id_kelompok', '=', 'k.id')
+    ->leftJoin('kader as p', 'k.id_pembina', '=', 'p.id');
     if($request->search){
       if($request->type == 1)
         $kader->where(DB::raw("lower(kader.nama_lengkap)"), "like", DB::raw("lower('%".$request->search."%')"));
@@ -53,7 +54,7 @@ class PencarianController extends Controller
       $kader->where('kader.villages_id', $request->desa);
     }
     if($request->pembina){
-      $kader->where('kader.id_pembina', $request->pembina);
+      $kader->where('k.id_pembina', $request->pembina);
     }
     switch($request->umur){
       case 1:
@@ -98,10 +99,18 @@ class PencarianController extends Controller
       DB::raw("date_part('year', age(now() , kader.usia_jenjang))||' Tahun - '|| date_part('month', age(now() , kader.usia_jenjang))|| ' Bulan' as usia_jenjang_raw"),
       'kader.darah',
       DB::raw("CASE WHEN p.nama_lengkap is not null THEN p.nama_lengkap WHEN kader.nama_pembina is not null THEN kader.nama_pembina ELSE '-' END as nama_pembina"),
+      'k.nama_kelompok',
       'kader.job',
       'kader.pendidikan'
     ]);
 
 		return datatables()->of($data)->toJson();
+	}
+
+  public function pembina(Request $request)
+	{
+		$data = Kader::whereRaw("lower(nama_lengkap) LIKE lower('%". $request->search ."%')")
+    ->where('pembina', '1')->where('verif', '1')->take(5)->get();
+		return response()->json($data);
 	}
 }

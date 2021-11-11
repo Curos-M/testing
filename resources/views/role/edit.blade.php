@@ -21,7 +21,7 @@
               <label for="username" class="form-label mb-0">User</label>
               <div class="mt-0">
               @foreach($data->user as $user)
-                <h4><span class="badge bg-dpd">{{ $user->username }}</span></h4>
+                <h4><span class="badge bg-dpd">{{ $user->full_name }}</span></h4>
               @endforeach
               </div>
               <hr>
@@ -30,18 +30,22 @@
               <legend>Hak Akses</legend>
               <div class="row row-sm mg-b-10">
                 @foreach($perms as $perm)
-                  <div class="col-sm-2 ml-3">
-                    <h4><b>{{ $perm->module}}</b></h4>
-                    @foreach($perm->actions as $act)
-                      <div class="d-flex justify-content-between mx-3 my-2">
-                        <label>{{$act->raw}}</label>
-                        <?php $checkedStr = $act->active ? 'checked="checked"' : null; ?> 
-                        <div class="custom-control custom-switch">
-                          <input data-bootstrap-switch name="roleperms[]" value="{{ $act->value }}" data-on-color="dpd" type="checkbox" id="{{ $act->value }}" switch="none" {!! $checkedStr !!} >
-                          <label class="form-label" for="{{ $act->value }}" data-on-label="Ya"  data-off-label="X"></label>
-                        </div>
+                  <div class="col-lg-3 ml-3">
+                    <div class="card">
+                      <div class="card-body">
+                        <h4><b>{{ $perm->module}}</b></h4>
+                        @foreach($perm->actions as $act)
+                          <div class="d-flex justify-content-between mx-3 my-3">
+                            <label>{{$act->raw}}</label>
+                            <?php $checkedStr = $act->active ? 'checked="checked"' : null; ?> 
+                            <div class="custom-control custom-switch">
+                              <input data-bootstrap-switch name="roleperms[]" value="{{ $act->value }}" data-on-color="dpd" type="checkbox" id="{{ $act->value }}" switch="none" {!! $checkedStr !!} >
+                              <label class="form-label" for="{{ $act->value }}" data-on-label="Ya"  data-off-label="X"></label>
+                            </div>
+                          </div>
+                        @endforeach
                       </div>
-                    @endforeach
+                    </div>
                   </div>
                 @endforeach    
               </div>

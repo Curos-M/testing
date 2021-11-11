@@ -50,14 +50,9 @@ Route::group(['middleware' => 'auth'], function() {
 	Route::post('/anggota',  [KaderController::class, 'save']);
   Route::post('/anggota/verif/{id}',  [KaderController::class, 'verif']);
   Route::get('/pasangan',  [KaderController::class, 'pasangan']);
-  Route::get('/pembina',  [KaderController::class, 'pembina']);
-  Route::get('/binaan',  [KaderController::class, 'searchBinaan']);
-  Route::get('/pembina/grid/{id}',  [KaderController::class, 'gridBinaan']);
   Route::get('/anak/grid/{id}',  [KaderController::class, 'gridAnak']);
   Route::post('/anak/{id}',  [KaderController::class, 'getAnak']);
   Route::post('/anak',  [KaderController::class, 'saveAnak']);
-  Route::post('/binaan',  [KaderController::class, 'saveBinaan']);
-  Route::delete('/binaan/{id}',  [KaderController::class, 'deleteBinaan']);
 	Route::delete('/anggota/{id}',  [KaderController::class, 'delete'])->middleware('can:anggota-delete');
   Route::delete('/anggota/anak/{id}',  [KaderController::class, 'deleteAnakKader']);
   Route::delete('/anak/{id}',  [KaderController::class, 'deleteAnak']);
@@ -75,12 +70,16 @@ Route::group(['middleware' => 'auth'], function() {
 
   Route::get('/kelompok',  [KelompokController::class, 'index']);
   Route::get('/kelompok/grid',  [KelompokController::class, 'grid']);
-  Route::get('/kelompok/edit/{id?}',  [KelompokController::class, 'edit']);
-  Route::post('/kelompok/view/{id?}',  [KelompokController::class, 'lihat']);
+  Route::get('/kelompok/edit/{id}',  [KelompokController::class, 'edit']);
+  Route::post('/kelompok/view/{id}',  [KelompokController::class, 'lihat']);
   Route::post('/kelompok',  [KelompokController::class, 'save']);
+  Route::post('/binaan',  [KelompokController::class, 'searchBinaan']);
   Route::delete('/kelompok/{id}',  [KelompokController::class, 'delete']);
+  Route::post('/kelompok/edit/anggota/{id}',  [KelompokController::class, 'addAnggota']);
+  Route::delete('/kelompok/edit/anggota/{id}',  [KelompokController::class, 'deleteAnggota']);
 
   Route::get('/pencarian',  [PencarianController::class, 'index']);
   Route::get('/pencarian/grid',  [PencarianController::class, 'grid']);
+  Route::get('/pembina',  [PencarianController::class, 'pembina']);
   
 });

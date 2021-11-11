@@ -88,19 +88,10 @@ $verifDisabled = $data->verif ? 'disabled' : null;
             </div>
           </div>
           @if($data->pembina)
-            <div class="form-group">
-            <select class="form-control selectbs4" style="width: 100%;" id="add_binaan"></select>
-              <label for="exampleInputPassword1">Anggota Binaan</label>
-              <table id="binaan" class="table table-striped table-bordered dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                <thead>
-                  <tr>
-                    <th style="width:10%">No</th>
-                    <th>Nama</th>
-                    <th style="width:10%"></th>
-                  </tr>
-                </thead>
-              </table>
-            </div>
+          <div class="form-group">
+            <label>Jumlah Binaan</label>
+            <input type="text" disabled class="form-control" value="{{$data->jumlah_binaan}}">
+          </div>
           @endif
         </div>
       </div>
@@ -209,25 +200,8 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                 </div>
               </div>
               <div class="form-group col-md-6">  
-                @if($data->id_pembina)
-                <div class="row">
-                  <div class="col-md-12">
-                    <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
-                  </div>
-                  <div class="col-md-12">
-                    <input type="hidden" name="hidden_pembina" id="hidden_pembina">
-                    <select required class="form-control selectbs4" disabled style="width: 100%;" id="id_pembina" name="id_pembina"></select>
-                  </div>
-                  <input type="hidden" name='id_pembina' value="{{$data->id_pembina}}">
-                  <!-- <div class="col-md-2">
-                    <a href="{{ url('/'.$link.'/edit/'.$data->id_pembina) }}" style="width: 100%;" type="button" class="btn btn-warning"><i class="fa fa-address-card"></i></a>
-                  </div> -->
-                </div>
-                @else
-                  <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
-                  <input type="hidden" name="hidden_pembina" id="hidden_pembina">
-                  <select class="form-control selectbs4" style="width: 100%;" id="id_pembina" name="id_pembina"></select>
-                @endif
+                <label for="exampleInputPassword1">Nama Pembina/Pembimbing</label>
+                <input type="text" name="nama_pembina" class="form-control" {{$data->nama_pembina ? 'disabled' : ''}} value="{{$data->nama_pembina??$data->nama_pembinaStr}}">
               </div>
               <div class="form-group col-md-6">
                 <label for="exampleInputPassword1">Awal Keanggotaan</label>
@@ -489,7 +463,7 @@ $(document).ready(function (){
               icon += '<a href="{{url("/anggota/edit")}}/' + data.id +'" title="Edit" type="button" class="btn btn-success btn-sm waves-effect gridEdit"><i class="ti-marker-alt"></i> Edit</a>';
             }
             icon += '&nbsp;<a href="#" title="Delete" '
-              + 'delete-title="Hapus {{ $title }} ' + data.nama + '" ';
+              + 'delete-title="Hapus Anak ' + data.nama + '" ';
               if(!data.anggota){
                 icon += "delete-action='{{ url('/anak') }}"+ '/' + data.id + "'";
               }else{
@@ -535,56 +509,6 @@ $(document).ready(function (){
     })
   });
 
-  var bina = $('#binaan').DataTable({
-    ajax: {
-      url: "{{ url('pembina/grid') }}/{{$data->id}}",
-      dataSrc: ''
-    },
-    columns: [
-      { 
-        data:null,
-          render: function(data, type, full, meta){
-            return meta.row + 1
-          }
-      },
-      { 
-        data:null,
-          render: function(data, type, full, meta){
-            if(data.anak){
-              return "<a>"+data.nama+" </a>(<a href={{url('anggota/edit')}}/"+data.id+">"+data.nama_ortu+"</a>)"
-            }else{
-              return "<a href={{url('anggota/edit')}}/"+data.id+">"+data.nama+"</a>"
-            }
-        }
-      },
-      { 
-        data:null,
-          render: function(data, type, full, meta){
-            if(data.anak){
-              return "<a>"+data.nama+" </a>(<a href={{url('anggota/edit')}}/"+data.id+">"+data.nama_ortu+"</a>)"
-            }else{
-              return '<a href="#" title="Delete" '
-              + 'delete-title="Hapus {{ $title }} ' + data.nama + '" '
-              + 'delete-action="{{ url('/binaan') }}'+ '/' + data.id + '" '
-              + 'delete-message="Apakah anda yakin untuk menghapus binaan ini?" '
-              + 'class="btn btn-danger btn-sm waves-effect gridDelete"><i class="fa fa-minus"></i></a>';
-            }
-        }
-      }
-    ],
-    dom: '<"row"' +
-        '<"col-md-12"<"row"<"col-md-6"B> > >' +
-        '<"col-md-12"rt> <"col-md-12"<"row"<"col-md-5"i><"col-md-7"p>>> >',
-    oLanguage: {
-      oPaginate: { "sPrevious": '<', "sNext": '>' },
-      sInfo: "Halaman _PAGE_ dari _PAGES_",
-      sLengthMenu: "Hasil :  _MENU_",
-      sEmptyTable: "Tidak ada binaan",
-      sInfoEmpty: ""
-    },
-    pageLength: 5,
-    ordering: false
-  });
 
   $('#addRow').on( 'click', function () {
     $.ajax({
@@ -744,7 +668,6 @@ $(document).ready(function (){
           $('#anakModal').modal('hide');
         },
         error: function(data){
-          console.log(data)
           swal.fire({
             toast: true,
             icon: data.status,
@@ -803,145 +726,6 @@ $(document).ready(function (){
       $('#hidden_pasangan').val('false')
     }
   });
-
-  $('#id_pembina').select2({
-    theme: 'bootstrap4',
-    allowClear: true,
-    placeholder: 'Nama Pembina',
-    width: 'resolve',
-    tags: true,
-    ajax: {
-      url: "{{url('pembina')}}",
-      dataType: 'json',
-      delay: 500,
-      data: function (params) {
-      var query = {
-        search: params.term,
-        id: $('#id').val(),
-        ortu: '1',
-        jenjang: "{{$data->jenjang_anggota}}"
-      }
-      return query;
-    },
-      processResults: function (data) {
-        return {
-          results:  $.map(data, function (item) {
-            return {
-              text: item.nama_lengkap+' - '+item.nomor_urut,
-              id: item.id
-            }
-          })
-        };
-      },
-      cache: false,
-    }
-  }).on('select2:open', () => {
-    document.querySelector('.select2-search__field').focus();
-  }).on('change', function(){
-    let opt = this.options.selectedIndex
-    if(!$(this.options[opt]).attr('data-select2-tag') && this.options[opt].value){
-      $('#hidden_pembina').val('true')
-    }else{
-      $('#hidden_pembina').val('false')
-    }
-  });;
-
-  $('#add_binaan').select2({
-    theme: 'bootstrap4',
-    allowClear: true,
-    placeholder: 'Tambah Binaan',
-    width: 'resolve',
-    ajax: {
-      url: "{{url('binaan')}}",
-      dataType: 'json',
-      delay: 500,
-      data: function (params) {
-      var query = {
-        search: params.term,
-        id: $('#id').val(),
-        jenjang: "{{$data->jenjang_anggota}}"
-      }
-      return query;
-    },
-      processResults: function (data) {
-        return {
-          results:  $.map(data, function (item) {
-            return {
-              text: item.nama_lengkap+' - '+item.nomor_urut,
-              id: item.id
-            }
-          })
-        };
-      },
-      cache: false,
-    }
-  }).on('select2:open', () => {
-    document.querySelector('.select2-search__field').focus();
-  }).on('change', function(){
-    if(this.value){
-      $.ajax({
-        type: "POST",
-        url: "{{url('binaan')}}",
-        data: {id:"{{$data->id}}",id_binaan: this.value},
-        success: function(data){
-          swal.fire({
-            toast: true,
-            icon: data.status,
-            title: data.messages,
-            padding: '2em',
-            showConfirmButton: false,
-            timer: 2000,
-          });
-          bina.ajax.reload()
-          setTimeout(() =>{
-            $('#add_binaan').val(null).trigger('change');
-          },500)
-        },
-        error: function(data){
-          swal.fire({
-            toast: true,
-            icon: data.status,
-            title: "Hubungi Admin",
-            padding: '2em',
-          });
-        }
-      });
-    }
-  });
-
-  $('#pembimbing_id').select2({
-    theme: 'bootstrap4',
-    allowClear: true,
-    dropdownParent: $('#anakModal'),
-    placeholder: 'Nama Pembina',
-    width: 'resolve',
-    ajax: {
-      url: "{{url('pembina')}}",
-      dataType: 'json',
-      delay: 500,
-      data: function (params) {
-      var query = {
-        search: params.term,
-        id: $('#id').val(),
-        ortu: '0'
-      }
-      return query;
-    },
-      processResults: function (data) {
-        return {
-          results:  $.map(data, function (item) {
-            return {
-              text: item.nama_lengkap+' - '+item.id,
-              id: item.id
-            }
-          })
-        };
-      },
-      cache: false,
-    }
-  }).on('select2:open', () => {
-    document.querySelector('.select2-search__field').focus();
-  });
   <?php 
     $pas = $data->pasangan ? 'data-select2-tag=true' : '';
     $pem = $data->nama_pembinaStr ? 'data-select2-tag=true' : '';
@@ -951,7 +735,6 @@ $(document).ready(function (){
   $('#desa').append('<option value={{$data->villages_id}}>{{$data->desa}}</option>');
   $('#pasangan').append("<option {{$pas}} value={{$data->pasangan_id??$data->pasangan}}>{{$data->nama_pasangan??$data->pasangan}}</option>").trigger('change');
   $('#aNama').append('<option value=></option>');
-  $('#id_pembina').append("<option {{$pem}} value={{$data->id_pembina??$data->nama_pembinaStr}}>{{$data->nama_pembina??$data->nama_pembinaStr}}</option>").trigger('change');
 
   $('#kota').on('change', function(){
     if(this.value){

@@ -75,7 +75,7 @@
                 
                 if("{{ $canDelete }}")
                 icon += '&nbsp;<a href="#" title="Delete" '
-                  + 'delete-title="Hapus {{ $title }} ' + data.username + '" '
+                  + 'delete-title="Hapus {{ $title }} ' + data.nama_lengkap+ '" '
                   + 'delete-action="{{ $link }}'+ '/' + data.id + '" '
                   + 'delete-message="Apakah anda yakin untuk menghapus data ini?" '
                   + 'class="btn btn-danger btn-sm waves-effect gridDelete"><i class="ti-trash"></i> Hapus</a>';

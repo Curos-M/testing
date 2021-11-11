@@ -263,7 +263,7 @@
           data:'usia_jenjang',
           orderable: false,
           render: function(data, type, full, meta){
-            if( !meta.settings._responsive.s.current[11])
+            if( !meta.settings._responsive.s.current[12])
               return "<br><span>"+data+"<br>("+full.usia_jenjang_raw+")</span>";
             else
               return "<span>"+data+"<br>("+full.usia_jenjang_raw+")</span>";
@@ -273,8 +273,8 @@
           data:'nama_pembina',
           orderable: false,
           render: function(data, type, full, meta){
-            if( !meta.settings._responsive.s.current[11])
-              return "<br><span>"+data+"</span>";
+            if( !meta.settings._responsive.s.current[13])
+              return "<br><span>"+data+" ("+full.nama_kelompok+")"+"</span>";
             else
               return "<span>"+data+"</span>";
           }

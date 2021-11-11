@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Kader;
 use App\Models\Anak;
+use App\Models\User;
 
 use Illuminate\Http\Request;
 use DB;
@@ -12,6 +13,7 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use App\Libs\Helpers;
+use App\Models\Kelompok;
 use Yajra\DataTables\Contracts\DataTable;
 
 
@@ -47,7 +49,7 @@ class KaderController extends Controller
     $data->jenjang_anggota = null;
     $data->usia_jenjang = null;
     $data->nama_pembina = null;
-    $data->id_pembina = null;
+    $data->id_kelompok = null;
     $data->pasangan_id = null;
     $data->pasangan = null;
     $data->nama_pasangan = null;
@@ -59,6 +61,7 @@ class KaderController extends Controller
     $data->nik = null;
     $data->ktp = null;
     $data->nomor_urut = null;
+    $data->rekomendasi = null;
     $data->verif = 0;
     $data->verif_user = null;
     $data->verif_date = null;
@@ -100,30 +103,6 @@ class KaderController extends Controller
 		return response()->json($data);
 	}
 
-  public function pembina(Request $request)
-	{
-		$data = Kader::where('nama_lengkap', 'LIKE', '%'. $request->search . '%')
-    ->where('pembina', '1')->where('verif', '1');
-    if($request->jenjang){
-      $data->where('jenjang_anggota', '>', $request->jenjang);
-    } 
-    if($request->id && $request->ortu){
-      $data = $data->whereNotIn('id', [$request->id]);
-    }
-    $data = $data->take(5)->get();
-		return response()->json($data);
-	}
-
-  public function searchBinaan(Request $request)
-	{
-		$data = Kader::where('nama_lengkap', 'LIKE', '%'. $request->search . '%')
-    ->whereNull('id_pembina')
-    ->whereNotIn('id', [$request->id])
-    ->where('verif', '1')
-    ->where('jenjang_anggota', '<', $request->jenjang);
-    $data= $data->take(5)->get();
-		return response()->json($data);
-	}
 
   public function searchAnak(Request $request)
 	{
@@ -135,17 +114,6 @@ class KaderController extends Controller
     
     $data= $data->take(5)->get();
     // dd($data);
-		return response()->json($data);
-	}
-
-
-  public function gridBinaan(Request $request, $id = null)
-	{
-    $anak = Anak::join('kader as k','kader_id', '=', 'k.id')->where('pembimbing_id', $id)
-    ->select(['nama', 'k.id', DB::raw('1 as anak'),'k.nama_lengkap as nama_ortu']);
-		$data = Kader::where('id_pembina', $id)
-    ->select(['nama_lengkap as nama', 'id', DB::raw('0 as anak'),DB::raw('null as nama_ortu')])->union($anak)->get();
-
 		return response()->json($data);
 	}
 
@@ -169,7 +137,7 @@ class KaderController extends Controller
       'nama_lengkap as nama',
       DB::raw("date_part('year', tanggal_lahir) as tahun_lahir"),
       'pendidikan',
-      DB::raw("CASE WHEN nama_pembina is null and id_pembina is null THEN 'Tidak' ELSE 'Ya' END as tarbiyah"),
+      DB::raw("CASE WHEN nama_pembina is null and id_kelompok is null THEN 'Tidak' ELSE 'Ya' END as tarbiyah"),
       DB::raw('1 as anggota')
     ])->union($anak)->orderBy('tahun_lahir', 'asc')->get();
 
@@ -184,7 +152,7 @@ class KaderController extends Controller
     ->join("_villages as v", "villages_id", "=", "v.id")
     ->leftjoin("users as u", 'verif_by', '=', 'u.id')
     ->leftJoin("kader as p", "kader.pasangan_id", '=', 'p.id')
-    ->leftJoin("kader as b", "kader.id_pembina", '=', 'b.id')
+    ->leftJoin("kelompok as k", "kader.id_kelompok", '=', 'k.id')
     ->select('kader.id',
       'kader.nik',
       'kader.nomor_urut',
@@ -218,15 +186,19 @@ class KaderController extends Controller
       'kader.nama_pembina as nama_pembinaStr',
       'kader.rekomendasi',
       'p.nama_lengkap as nama_pasangan',
-      'b.nama_lengkap as nama_pembina',
-      'kader.id_pembina',
+      'k.nama_pembina as nama_pembina',
+      'kader.id_kelompok',
       'u.full_name as verif_user',
       DB::Raw("to_char(kader.verif_at, 'dd-mm-yyyy hh24:mi:ss')as verif_date")
       )->find($id);
 		$data = $user != null ? $user : $this->__db();
 		$label = $user != null ? 'Ubah' : 'Tambah Baru';
-    $data->jumlah_binaan = Kader::where('id_pembina', $id)->count();
-
+    $kelompok = Kelompok::where('id_pembina', $id)->select('id')->get();
+    $data->jumlah_binaan = 0;
+    foreach($kelompok as $k){
+      $count = Kader::where('id_kelompok', $k->id)->count();
+      $data->jumlah_binaan += $count;
+    }
     $jenjang = DB::table('jenjang')->get();
 	
 		$this->setBreadcrumb(['Master Data' => '#', 'Anggota' => '/anggota', $label => '#']);
@@ -237,7 +209,6 @@ class KaderController extends Controller
 
 	public function save(Request $request)
 	{
-    // dd($request->all());
     $pembina = $request->pembina ? 1 : 0;
     $request->validate([
       'nama_lengkap' => 'required',
@@ -282,13 +253,20 @@ class KaderController extends Controller
       $prefix = Helpers::prefix($request);
 
       $latest = DB::table('kader')->where('regencies_id', $request->regencies_id)->whereNotNull('nomor_urut')->count();
-      // dd($latest);
 
       $no = $prefix->prefix . (str_pad((int)$latest + 1, 5, '0', STR_PAD_LEFT));
-      // dd($no);
+
+      $kelompok = Kelompok::where('id_pembina', $val->id)->select('id')->get();
+      if(!$pembina && $kelompok){
+        foreach($kelompok as $k){
+          Kader::where('id_kelompok', $k->id)->update(['id_kelompok' => null, 'updated_by' => Auth::user()->getAuthIdentifier()]);
+        }
+        Kelompok::where('id_pembina', $val->id)->update(['deleted_at' => now()->toDateTimeString(), 'deleted_by' => Auth::user()->getAuthIdentifier()]);
+      }
+
       if(isset($request->id)){
-        $user =	Kader::find($request->id);
-        $user->update([
+        $kader =	Kader::find($request->id);
+        $kader->update([
           'photo' => $filePath,
           'nik' => $request->nik,
           'nama_lengkap' => $request->nama_lengkap,
@@ -318,7 +296,7 @@ class KaderController extends Controller
       } else {
         $request->validate(['nik' => 'nullable|unique:kader,nik']);
   
-        $user = Kader::create([
+        $kader = Kader::create([
           'nomor_urut' => $no,
           'photo' => $filePath,
           'nik' => $request->nik,
@@ -348,37 +326,35 @@ class KaderController extends Controller
         ]);
         $status = 'Berhasil menambah anggota baru.';
       }
-
-      if($request->hidden_pembina == "true" && $request->id_pembina != null){
-        $user->update(['id_pembina' => $request->id_pembina, 'nama_pembina' => null]);
-      }elseif($request->hidden_pembina == "false"  && $request->id_pembina != null){
-        $user->update(['nama_pembina' => $request->id_pembina, 'id_pembina' => null]);
-      }elseif($request->id_pembina == null){
-        $user->update(['nama_pembina' => null, 'id_pembina' => null]);
+      if($request->nama_pembina){
+        $kader->update(['nama_pembina' => $request->nama_pembina, 'id_kelompok' => null]);
       }
 
       if($request->hidden_pasangan == "true"  && $request->pasangan != null){
-        $user->update(['pasangan_id' => $request->pasangan, 'pasangan' => null]);
-        Kader::where('pasangan_id' ,$user->id)->update(['pasangan_id' => null]);
-        Kader::find($request->pasangan)->update(['pasangan' => null, 'pasangan_id' => $user->id]);
+        $kader->update(['pasangan_id' => $request->pasangan, 'pasangan' => null]);
+        Kader::where('pasangan_id' ,$kader->id)->update(['pasangan_id' => null]);
+        Kader::find($request->pasangan)->update(['pasangan' => null, 'pasangan_id' => $kader->id]);
       }elseif($request->hidden_pasangan == "false"  && $request->pasangan != null){
-        $user->update(['pasangan' => $request->pasangan, 'pasangan_id' => null]);
-        Kader::where('pasangan_id' ,$user->id)->update(['pasangan_id' => null]);
+        $kader->update(['pasangan' => $request->pasangan, 'pasangan_id' => null]);
+        Kader::where('pasangan_id' ,$kader->id)->update(['pasangan_id' => null]);
       }elseif($request->pasangan == null){
-        Kader::where('pasangan_id' ,$user->id)->update(['pasangan_id' => null]);
-        $user->update(['pasangan' => null, 'pasangan_id' => null]);
+        Kader::where('pasangan_id' ,$kader->id)->update(['pasangan_id' => null]);
+        $kader->update(['pasangan' => null, 'pasangan_id' => null]);
+      }
+      
+      $user = User::where('anggota_id', $kader->id)->first();
+      if($pembina && !$user){
+        User::create([
+          'username' => $kader->nomor_urut,
+          'password' => bcrypt(Carbon::parse($kader->tanggal_lahir)->format('dmy')),
+          'full_name' => $kader->nama_lengkap,
+          'anggota_id' => $kader->id,
+          'created_by' => Auth::user()->getAuthIdentifier()
+        ]);
+      }elseif(!$pembina && $user){
+        User::where('anggota_id', $kader->id)->delete();
       }
 
-      if(!$request->pembina){
-        $binaanKader = Kader::where('id_pembina' ,$user->id);
-        if($binaanKader){
-          $binaanKader->update(['id_pembina' => null]);
-        }
-        $binaanAnak = Anak::where('pembimbing_id' ,$user->id);
-        if($binaanAnak){
-          $binaanAnak->update(['pembimbing_id' => null]);
-        }
-      }
       $request->session()->flash('success', $status);
       DB::commit();
     }catch(\exception $e){
@@ -387,7 +363,7 @@ class KaderController extends Controller
     }
 		
 
-		return redirect('/anggota/edit'.'/'.$user->id);
+		return redirect('/anggota/edit'.'/'.$kader->id);
 	}
 
 	public function delete(request $request, $id)
@@ -411,21 +387,19 @@ class KaderController extends Controller
       }
       
       if($anakKader && $data->pasangan_id){
-        $anakKader->update([
-          'ortu_id' => $data->pasangan_id
-        ]);
+        $anakKader->update(['ortu_id' => $data->pasangan_id]);
         $request->session()->flash('warning', 'Silahkan update data pasangan anggota');
         Kader::find($data->pasangan_id)->update(['pasangan_id' => null]);
+      }elseif($anakKader && !$data->pasangan_id){
+        $anakKader->update(['ortu_id' => null]);
       }
 
-      $binaanKader = Kader::where('id_pembina' ,$data->id);
-      if($binaanKader){
-        $binaanKader->update(['id_pembina' => null]);
-      }
-
-      $binaanAnak = Anak::where('pembimbing_id' ,$data->id);
-      if($binaanAnak){
-        $binaanAnak->update(['pembimbing_id' => null]);
+      $kelompok = Kelompok::where('id_pembina', $id)->select('id')->get();
+      if($kelompok){
+        foreach($kelompok as $k){
+          Kader::where('id_kelompok', $k->id)->update(['id_kelompok' => null, 'updated_by' => Auth::user()->getAuthIdentifier()]);
+        }
+        Kelompok::where('id_pembina', $id)->update(['deleted_at' => now()->toDateTimeString(), 'deleted_by' => Auth::user()->getAuthIdentifier()]);
       }
 
       if($data){
@@ -448,6 +422,7 @@ class KaderController extends Controller
       DB::commit();
     }catch(\Exception $e){
       DB::rollback();
+      dd($e);
       $results = array(
         'status' => 'error',
         'action' => 'Kesalahan',
@@ -462,8 +437,7 @@ class KaderController extends Controller
     
 		$data = Anak::find($id);
     if($data){
-      $data->update(['deleted_by' => Auth::user()->getAuthIdentifier()]);
-      $data->destroy($id);
+      $data->update(['deleted_at' => now()->toDateTimeString(), 'deleted_by' => Auth::user()->getAuthIdentifier()]);
       $results = array(
         'status' => 'success',
         'action' => 'Hapus Anak',
@@ -567,14 +541,6 @@ class KaderController extends Controller
           );
         }
   
-        if(!ctype_alpha($request->pembimbing_id) && $request->pembimbing_id != null){
-          $user->update(['pembimbing_id' => $request->pembimbing_id, 'pembimbing' => null]);
-        }elseif(ctype_alpha($request->id_pembina) && $request->id_pembina != null){
-          $user->update(['pembimbing' => $request->pembimbing_id, 'pembimbing_id' => null]);
-        }elseif($request->id_pembina == null){
-          $user->update(['pembimbing' => null, 'pembimbing_id' => null]);
-        }
-  
         DB::commit();
       }catch(\Exception $e){
         DB::rollback();
@@ -591,70 +557,6 @@ class KaderController extends Controller
 		return response()->json($results);
 	}
 
-  public function saveBinaan(Request $request)
-	{
-    try{
-      DB::beginTransaction();
-
-        $user =	Kader::find($request->id_binaan);
-        $user->update([
-          'id_pembina' => $request->id,
-          'nama_pembina' => null,
-          'updated_by' => Auth::user()->getAuthIdentifier()
-        ]);
-        $results = array(
-          'status' => 'success',
-          'action' => 'Tambah Binaan',
-          'messages' => 'Binaan berhasil Ditambah'
-        );
-    
-
-      DB::commit();
-    }catch(\Exception $e){
-      DB::rollback();
-      $results = array(
-        'status' => 'error',
-        'action' => 'Kesalahan',
-        'messages' => 'Hubungi Administrator'
-      );
-      dd($e);
-    }
-
-
-		return response()->json($results);
-	}
-  public function deleteBinaan($id)
-	{
-    try{
-      DB::beginTransaction();
-
-        $user =	Kader::find($id);
-        $user->update([
-          'id_pembina' => null,
-          'nama_pembina' => null,
-          'updated_by' => Auth::user()->getAuthIdentifier()
-        ]);
-        $results = array(
-          'status' => 'success',
-          'action' => 'Hapus Binaan',
-          'messages' => 'Binaan berhasil Dihapus'
-        );
-    
-
-      DB::commit();
-    }catch(\Exception $e){
-      DB::rollback();
-      $results = array(
-        'status' => 'error',
-        'action' => 'Kesalahan',
-        'messages' => 'Hubungi Administrator'
-      );
-      dd($e);
-    }
-
-
-		return response()->json($results);
-	}
 
   public function verif(Request $request, $id){
 

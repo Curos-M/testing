@@ -21,7 +21,9 @@ class User extends Authenticatable
         'username',
         'full_name',
         'password',
-        'created_by'
+        'anggota_id',
+        'created_by',
+        'updated_by'
     ];
 
     /**

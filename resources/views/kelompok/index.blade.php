@@ -8,6 +8,8 @@
     border-top: 0px solid #dee2e6;
   }
 </style>
+<link rel="stylesheet" href="{{asset('plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
+<link rel="stylesheet" href="{{asset('plugins/select2/css/select2.min.css')}}">
 @endsection
 
 @section('content-table')
@@ -34,11 +36,13 @@
 @endsection
 
 @section('js-table')
+<script src="{{asset('plugins/select2/js/select2.full.min.js')}}"></script>
 <script>
   $(document).ready(function (){
     $("#grid thead").hide();
     $('#appModal').on('hide.bs.modal', function() {
       $('#appModal').find('.modal-body').html('');
+      $('#dpdModal').unbind()
     });
     let grid = $('#grid').DataTable({
       buttons: [
@@ -59,11 +63,69 @@
             "<div class='col-md-12 mt-2'"+
               "<div class='row'>"+
                 "<div class='form-group col-md-12'>"+
-                  "<input type='text' id='nama_kelompok' maxlength='23' placeholder='Nama Kelompok' class='form-control'>"+
+                  @if ($user->id == '1')
+                    "<select class='form-control selectbs4' style='width: 100%;' id='pembina'></select>"+
+                  @else
+                    "<input type='hidden' id='pembina' value='{{$user->anggota_id}}'>"+
+                  @endif
+                  "<input type='text' id='nama_kelompok' maxlength='23' placeholder='Nama Kelompok' class='form-control mt-2'>"+
                 "</div>"+
               "</div>"+
             "</div>"
             $('#appModal').find('.modal-body').append(body);
+            $('#dpdModal').on('click', function(){
+              let nama = $('#nama_kelompok').val()
+              let id = $('#pembina').val()
+              $.ajax({
+                type  : "POST",
+                url   : "{{$link}}",
+                data  : {nama_kelompok: nama, id_pembina:id},
+                success: function(data){
+                  sweetAlert(
+                    data.status,
+                    data.action,
+                    data.messages,
+                  );
+                  $("#appModal").modal('hide');
+                  grid.ajax.reload()
+                },
+                error: function(data){
+                  alert('error, hubungi admin')
+                }
+              })
+            })
+            if("{{$user->id}}" == '1'){
+              $('#pembina').select2({
+                theme: 'bootstrap4',
+                allowClear: true,
+                placeholder: 'Nama Pembina',
+                width: 'resolve',
+                ajax: {
+                  url: "{{url('pembina')}}",
+                  dataType: 'json',
+                  delay: 500,
+                  data: function (params) {
+                  var query = {
+                    search: params.term,
+                  }
+                  return query;
+                },
+                  processResults: function (data) {
+                    return {
+                      results:  $.map(data, function (item) {
+                        return {
+                          text: item.nama_lengkap+' - '+item.nomor_urut,
+                          id: item.id
+                        }
+                      })
+                    };
+                  },
+                  cache: false,
+                }
+              }).on('select2:open', () => {
+                document.querySelector('.select2-search__field').focus();
+              })
+            }
           }
         }
       ],
@@ -106,28 +168,42 @@
     });
 
     $('#grid').on('click', '#view', function(){
+      var id = this.name
       $.ajax({
         type  : "POST",
-        url   : "{{$link}}/view/"+this.name,
+        url   : "{{$link}}/view/"+id,
         success: function(data){
-          console.log(data.kader)
+          var winWidth =  $(window).width();
           $('#appModal').modal('show'); 
-          $('.modal-dialog').addClass('modal-xl')
+          $('.modal-dialog').addClass('modal-lg')
           $('.modal-header').css("border-bottom-width", "5px")
           $('.modal-header').css("border-bottom-style", "solid")
           $('.modal-header').css("border-bottom-color", "rgb(253, 80, 0)")
           $(".modal-title").html(data.nama_kelompok)
           $(".btn-dpd").removeClass('d-none')  
-          $("#dpdModal").html('Simpan')  
+          $(".modal-action-save").removeClass('d-none')
+          $(".modal-action-save").html('Edit')
+          $("#dpdModal").html('Catatan')
+          $('.modal-action-close').html('Tutup') 
+          $('.modal-action-close').addClass('mr-auto') 
           let body = ""
+          if(data.note){
+            var tanggal = "Tanggal Dibuat : "+data.note.tanggal
+            var catatan = data.note.catatan
+            var photo = data.note.photo
+          }else{
+            var tanggal = ""
+            var catatan = "Tidak Ada Catatan"
+            var photo = ""
+          }
           body += 
-          "<div class='col-md-12 mt-2'"+
+          "<div class='col-lg-12 mt-2'>"+
             "<div class='row'>"+
-              "<div class='col-md-3'>"+
+              "<div class='col-lg-4'>"+
                 "<h4>Pembina Kelompok</h4>"+
                 "<h5><span class='badge bg-dpd mx-1'>"+data.nama_pembina+"</span></h5>"+
                 "<h4>Anggota Kelompok</h4>"+
-                "<div class='row'>";
+                "<div class='row col-md-12'>";
                   for(let i = 0; i<data.kader.length;i++){
                     body +=
                     "<h5><span class='badge bg-dpd mx-1'>"+data.kader[i].nama_lengkap+"</span></h5>";
@@ -135,9 +211,20 @@
                 body +=
                 "</div>"+
               "</div>"+
+              "<div class='col-lg-8'>"+
+                "<div class='row'>"+
+                  "<h4 class='col-lg-7'>Catatan Terakhir</h3>"+
+                  "<p class='col-lg-5 text-right'>"+tanggal+"</p>"+
+                "</div>"+
+                "<p>"+catatan+"</p>"+
+                "<img src=''>"+
+              "</div>"+
             "</div>"+
           "</div>"
           $('#appModal').find('.modal-body').append(body);
+          $(".modal-action-save").on('click', function(){
+            window.location.href = "{{url('kelompok/edit')}}/"+id
+          })
         },
         error: function(data){
           alert('error, hubungi admin')
@@ -145,26 +232,7 @@
       })
     })
 
-    $('#dpdModal').on('click', function(){
-      let nama = $('#nama_kelompok').val()
-      $.ajax({
-        type  : "POST",
-        url   : "{{$link}}",
-        data  : {nama_kelompok: nama},
-        success: function(data){
-          sweetAlert(
-            data.status,
-            data.action,
-            data.messages,
-          );
-          $("#appModal").modal('hide');
-          grid.ajax.reload()
-        },
-        error: function(data){
-          alert('error, hubungi admin')
-        }
-      })
-    })
+    
   });
 </script>
 @endsection

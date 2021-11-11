@@ -1,7 +1,27 @@
 @extends('partials.form')
 <?php $none = isset($data->id) ? 'd-none' : null; ?> 
 <?php $col = isset($data->id) ? 'col-md-12' : 'col-md-6'; ?> 
-@section('css-table')
+@section('css-form')
+<style>
+  .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #fff;
+  }
+  .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    color: #000;
+  }
+  .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #fd5000;
+    border: 1px solid #fd5000;
+  }
+  .select2-container--default .select2-results__option--highlighted[aria-selected], .select2-container--default .select2-results__option--highlighted[aria-selected]:hover {
+    background-color: #fd5000;
+    color: #fff;
+  }
+  .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #ff7d40;
+    color: white;
+  }
+</style>
 @endsection
 
 @section('content-form')
@@ -27,7 +47,7 @@
             </div>
             <div class="form-group {{$col}}">
             <label for="password" class="form-label">Peran</label>
-              <select name="roles[]" class="select2 form-control select2-multiple" multiple="multiple" multiple data-placeholder="Choose ...">
+              <select id="role" name="roles[]" class="select2 form-control select2-multiple" multiple="multiple" multiple data-placeholder="Choose ...">
                 @foreach($data->roles as $role)
                 <?php $selected = in_array($role, $data->hasRoles) ? 'selected' : null; ?>
                   <option value="{{ $role }}" {!! $selected !!} >{{ $role }}</option>
@@ -44,5 +64,10 @@
 </div>
 @endsection
 
-@section('js-table')
+@section('js-form')
+<script>
+  $(document).ready(function() {
+    $('#role').select2();
+});
+</script>
 @endsection
