@@ -35,7 +35,7 @@
           <div class="row">
             <div class="form-group col-md-6">
               <label for="exampleInputEmail1">Username</label>
-              <input type="text" class="form-control" value="{{old('username', $data->username)}}" name="username" placeholder="Username">
+              <input type="text" {{$data->anggota_id ? "readonly" : ""}} class="form-control" value="{{old('username', $data->username)}}" name="username" placeholder="Username">
             </div>
             <div class="form-group col-md-6 {{$none}}">
               <label for="exampleInputPassword1">Password</label>
@@ -43,7 +43,7 @@
             </div>
             <div class="form-group col-md-6">
               <label for="exampleInputPassword1">Nama Lengkap</label>
-              <input type="text" class="form-control" value="{{old('full_name', $data->full_name)}}" name="full_name" placeholder="Nama Lengkap">
+              <input type="text" {{$data->anggota_id ? "readonly" : ""}} class="form-control" value="{{old('full_name', $data->full_name)}}" name="full_name" placeholder="Nama Lengkap">
             </div>
             <div class="form-group {{$col}}">
             <label for="password" class="form-label">Peran</label>

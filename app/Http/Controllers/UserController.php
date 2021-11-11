@@ -25,7 +25,7 @@ class UserController extends Controller
 		$data->id = null;
 		$data->full_name = null;
 		$data->username = null;
-		$data->email = null;
+		$data->anggota_id = null;
 
 		return $data;
 	}
