@@ -207,22 +207,24 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                 <label for="exampleInputPassword1">Awal Keanggotaan</label>
                 <input {{$verifDisabled}} type="text" id="awal_anggota" class="form-control flatpickr {{!$data->verif ? 'flatpickrcolor' : ''}} flatpickr-input" value="{{old('awal_anggota', $data->awal_anggota)}}" name="awal_anggota" placeholder="Awal Keanggotaan">
               </div>
-              <div class="form-group col-md-6">
-                <label for="exampleInputPassword1">Jenjang Keanggotaan</label>
-                <select class="form-control" id="jenjang_anggota" name="jenjang_anggota">
-                  @foreach ($jenjang as $j )
-                    <option value="{{$j->id}}" {{old('jenjang_anggota', $data->jenjang_anggota) == $j->id ?'selected': ''}}>{{$j->nama}}</option>
-                  @endforeach
-                </select>
-              </div>
-              <div class="col-md-6">
-                <div class="row">
-                  <div class="col-md-12"><label for="exampleInputPassword1">Usia Jenjang Keanggotaan</label></div>     
-                  <div class="form-group col-md-12">
-                    <input required type="text" class="form-control flatpickr flatpickrcolor flatpickr-input" value="{{old('usia_jenjang', $data->usia_jenjang)}}" name="usia_jenjang" placeholder="Usia Jenjang Keanggotaan">
+              @if ($data->jenjang_visible)
+                <div class="form-group col-md-6">
+                  <label for="exampleInputPassword1">Jenjang Keanggotaan</label>
+                  <select class="form-control" id="jenjang_anggota" name="jenjang_anggota">
+                    @foreach ($jenjang as $j )
+                      <option value="{{$j->id}}" {{old('jenjang_anggota', $data->jenjang_anggota) == $j->id ?'selected': ''}}>{{$j->nama}}</option>
+                    @endforeach
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <div class="row">
+                    <div class="col-md-12"><label for="exampleInputPassword1">Usia Jenjang Keanggotaan</label></div>     
+                    <div class="form-group col-md-12">
+                      <input required type="text" class="form-control flatpickr flatpickrcolor flatpickr-input" value="{{old('usia_jenjang', $data->usia_jenjang)}}" name="usia_jenjang" placeholder="Usia Jenjang Keanggotaan">
+                    </div>
                   </div>
                 </div>
-              </div>
+              @endif
               <div class="form-group col-md-6">
                 <label for="exampleInputPassword1">Status Pernikahan</label>
                 <select class="form-control" id="status" name="status_pernikahan">

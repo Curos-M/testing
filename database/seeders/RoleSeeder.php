@@ -17,23 +17,23 @@ class RoleSeeder extends Seeder
     public static function run()
     {
         $data_role = [
-            [
-              'name'       => 'Administrator',
-              'guard_name' => 'web',
-              'created_at' => \Carbon\Carbon::now(),
-            ],
-            [
-              'name'       => 'testing',
-              'guard_name' => 'web',
-              'created_at' => \Carbon\Carbon::now(),
-            ]
+          [
+            'name'       => 'Administrator',
+            'guard_name' => 'web',
+            'created_at' => \Carbon\Carbon::now(),
+          ],
+          [
+            'name'       => 'Ketua UPA',
+            'guard_name' => 'web',
+            'created_at' => \Carbon\Carbon::now(),
+          ]
         ];
         Role::truncate();
-		$role = Role::insert(
-			$data_role
-		);
-    $user = User::find('1');
-    $user->assignRole('Administrator');
+        $role = Role::insert(
+        $data_role
+      );
+      $user = User::find('1');
+      $user->assignRole('Administrator');
         $role_first = Role::first();
 
         $permissions = [
@@ -68,10 +68,20 @@ class RoleSeeder extends Seeder
                 'action'     => ['view'],
             ],
             [
+              'name'       => 'verifikasi',
+              'guard_name' => 'web',
+              'action'     => ['view'],
+            ],
+            [
               'name'       => 'kelompok',
               'guard_name' => 'web',
-              'action'     => ['view', 'add', 'edit', 'delete'],
-          ],
+              'action'     => ['view all','view', 'add', 'edit', 'delete'],
+            ],
+            [
+              'name'       => 'filter',
+              'guard_name' => 'web',
+              'action'     => ['kota/kabupaten', 'kecamatan', 'desa/kelurahan'],
+            ],
         ];
         Permission::truncate();
         foreach ($permissions as $row) {

@@ -12,7 +12,7 @@ class NoteKelompok extends Model
   protected $table = 'note_kelompok';
   protected $fillable = [
     'id_kelompok',
-    'catatam',
+    'catatan',
     'photo',
     'created_by',
     'updated_by'

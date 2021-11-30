@@ -63,7 +63,7 @@
             "<div class='col-md-12 mt-2'"+
               "<div class='row'>"+
                 "<div class='form-group col-md-12'>"+
-                  @if ($user->id == '1')
+                  @if ($all)
                     "<select class='form-control selectbs4' style='width: 100%;' id='pembina'></select>"+
                   @else
                     "<input type='hidden' id='pembina' value='{{$user->anggota_id}}'>"+
@@ -94,7 +94,7 @@
                 }
               })
             })
-            if("{{$user->id}}" == '1'){
+            if("{{$all}}"){
               $('#pembina').select2({
                 theme: 'bootstrap4',
                 allowClear: true,
@@ -151,7 +151,7 @@
                   'delete-title="Hapus {{ $title }} ' + data.nama_kelompok + '" '+
                   'delete-action="{{ $link }}'+ '/' + data.id + '" '+
                   'delete-message="Apakah anda yakin untuk menghapus Kelompok ini?" '+
-                  'class="btn btn-danger btn-sm waves-effect float-right gridDelete"><i class="ti-trash"></i> Hapus</a>';
+                  'class="btn btn-black btn-sm waves-effect float-right gridDelete"><i class="ti-trash"></i> Hapus</a>';
                 html += 
               '</div>'+
             '</div>';

@@ -19,10 +19,12 @@
             </div>
             <div class="form-group col-md-12 {{$none}}">
               <label for="username" class="form-label mb-0">User</label>
-              <div class="mt-0">
-              @foreach($data->user as $user)
-                <h4><span class="badge bg-dpd">{{ $user->full_name }}</span></h4>
-              @endforeach
+              <div class="col-12 mt-0">
+                <div class="row">
+                  @foreach($data->user as $user)
+                    <h4><span class="badge bg-dpd ml-2">{{ $user->full_name }}</span></h4>
+                  @endforeach
+                </div>
               </div>
               <hr>
             </div>
@@ -30,7 +32,7 @@
               <legend>Hak Akses</legend>
               <div class="row row-sm mg-b-10">
                 @foreach($perms as $perm)
-                  <div class="col-lg-3 ml-3">
+                  <div class="col-lg-4">
                     <div class="card">
                       <div class="card-body">
                         <h4><b>{{ $perm->module}}</b></h4>

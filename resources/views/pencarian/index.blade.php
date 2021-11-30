@@ -160,7 +160,6 @@
         data:{district_id : id2},
         delay: 250,
         processResults: function (data) {
-          console.log(data)
           return {
             results:  $.map(data, function (item) {
               return {
@@ -273,10 +272,18 @@
           data:'nama_pembina',
           orderable: false,
           render: function(data, type, full, meta){
-            if( !meta.settings._responsive.s.current[13])
-              return "<br><span>"+data+" ("+full.nama_kelompok+")"+"</span>";
-            else
-              return "<span>"+data+"</span>";
+            if( !meta.settings._responsive.s.current[13]){
+              var span = "<br><span>"+data
+              if(full.nama_kelompok)
+                span +=" ("+full.nama_kelompok+")"
+              +"</span>";
+            }else{
+              var span = "<span>"+data
+              if(full.nama_kelompok)
+                span +=" ("+full.nama_kelompok+")"
+              +"</span>";
+            }
+            return span
           }
         },
       ],

@@ -33,15 +33,14 @@ class KelompokController extends Controller
 	{
 		$this->setBreadcrumb(['Kelompok' => '#']);
     $user = Auth::user();
+    $all = Auth::user()->can('kelompok-view all');
     
-		return $this->render('kelompok.index', ['user' => $user]);
+		return $this->render('kelompok.index', ['user' => $user, 'all' => $all]);
 	}
   public function grid()
 	{
     $user = Auth::user();
-    
-		$data = Kelompok::when($user, function($query, $user){
-      if($user->id != '1')
+		$data = Kelompok::when(!Auth::user()->can('kelompok-view all'), function($query) use($user){
       $query->where('id_pembina', $user->anggota_id);
     })->select([
       'id',
@@ -54,7 +53,11 @@ class KelompokController extends Controller
 
   public function edit(Request $request, $id = null)
 	{
-		$user = Kelompok::join('kader as k', 'kelompok.id_pembina', '=', 'k.id')
+    $user = Auth::user();
+		$kelompok = Kelompok::join('kader as k', 'kelompok.id_pembina', '=', 'k.id')
+    ->when(!Auth::user()->can('kelompok-view all'), function($query) use($user){
+      $query->where('id_pembina', $user->anggota_id);
+    })
     ->select(
       'kelompok.id',
       'kelompok.nama_pembina',
@@ -62,16 +65,38 @@ class KelompokController extends Controller
       'nama_kelompok',
       'k.jenjang_anggota'
       )->find($id);
-		$data = $user != null ? $user : $this->__db();
-		$label = $user != null ? 'Ubah' : 'Tambah Baru';
-
-    $kader = Kader::where('id_kelompok', $id)->select('nama_lengkap')->get();
+      if($id && !$kelompok){
+        abort(404);
+      }
+		$data = $kelompok != null ? $kelompok : $this->__db();
+		$label = $kelompok != null ? 'Ubah' : 'Tambah Baru';
 
 	
 		$this->setBreadcrumb(['Kelompok' => '#', $label => '#']);
     $this->setHeader($label);
 
 		return $this->render('kelompok.edit', ['data' => $data]);
+	}
+
+  public function editNote(Request $request, $id = null)
+	{
+    $user = Auth::user();
+		$data = Kelompok::leftJoin('note_kelompok as nk', 'kelompok.id', '=', 'nk.id_kelompok')
+    ->when(!Auth::user()->can('kelompok-view all'), function($query) use($user){
+      $query->where('id_pembina', $user->anggota_id);
+    })
+    ->find($id);
+      if($id && !$data){
+        abort(404);
+      }
+
+    $data->note = NoteKelompok::where('id_kelompok', $id)->get();
+dd($data->note);
+	
+		$this->setBreadcrumb(['Kelompok' => '#', "Catatan" => '#']);
+    $this->setHeader("Catatan");
+
+		return $this->render('kelompok.note', ['data' => $data]);
 	}
 
   public function save(Request $request)
@@ -152,8 +177,12 @@ class KelompokController extends Controller
   public function addAnggota(Request $request)
   {
     $data = Kader::where('id', $request->id);
+    $get = $data->first();
     if($data){
       $data->update(['id_kelompok' => $request->id_kelompok, 'nama_pembina' => null, 'updated_by' => Auth::user()->getAuthIdentifier()]);
+      if($get->jenjang_anggota){
+        $data->update(['jenjang_anggota' => '3', 'usia_jenjang' => now()->toDateTimeString()]);
+      }
       $results = array(
         'status' => 'success',
         'action' => 'Tambah Anggota',

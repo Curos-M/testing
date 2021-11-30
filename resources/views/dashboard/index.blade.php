@@ -9,16 +9,16 @@
 <div class="row">
   <div class="container-fluid">
     <div class="card card-default color-palette-box">
-      <div class="card-body">
+      <div class="card-body {{$data->desa ?'d-none':''}}">
         <div class="row">
-          <div class="col-sm-4">
+          <div class="col-sm-4 {{$data->kota ?'d-none':''}}">
             <select class="form-control selectbs4 form-control-sm" style="width: 100%;" id="kota"></select>
           </div>
-          <div class="col-sm-4">
-            <select disabled class="form-control selectbs4 form-control-sm" style="width: 100%;" id="kecamatan"></select>
-          </div>
-          <div class="col-sm-4">
-            <select disabled class="form-control selectbs4 form-control-sm" style="width: 100%;" id="desa"></select>
+          <div class="{{$data->kota ?'col-sm-6':'col-sm-4'}}{{$data->kecamatan ?' d-none':''}}">
+            <select {{$data->kota ?'':'disabled'}} class="form-control selectbs4 form-control-sm" style="width: 100%;" id="kecamatan"></select>
+          </div> 
+          <div class="{{$data->kota?$data->kecamatan?'col-sm-12':'col-sm-6':'col-sm-4'}}">
+            <select {{$data->kecamatan ?'':'disabled'}} class="form-control selectbs4 form-control-sm" style="width: 100%;" id="desa"></select>
           </div>
         </div>
       </div>
@@ -117,6 +117,7 @@
 <script>
 
   let camat = function(){
+
     var id = $('#kota').val()  
     $('#kecamatan').select2({
       theme: 'bootstrap4',
@@ -447,6 +448,8 @@
     camat()
     desa()
     call()
+
+
   });
 </script>
 @endsection

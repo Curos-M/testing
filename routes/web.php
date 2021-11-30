@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth'], function() {
   Route::get('/kelompok',  [KelompokController::class, 'index']);
   Route::get('/kelompok/grid',  [KelompokController::class, 'grid']);
   Route::get('/kelompok/edit/{id}',  [KelompokController::class, 'edit']);
+  Route::get('/kelompok/catatan/{id}',  [KelompokController::class, 'editNote']);
   Route::post('/kelompok/view/{id}',  [KelompokController::class, 'lihat']);
   Route::post('/kelompok',  [KelompokController::class, 'save']);
   Route::post('/binaan',  [KelompokController::class, 'searchBinaan']);

@@ -87,6 +87,7 @@ class UserController extends Controller
 				'email' => $request->email,
 				'password' => bcrypt($request->password),
 				'full_name' => $request->full_name,
+        'anggota_id' => '0',
         'created_by' => Auth::user()->getAuthIdentifier()
 			]);
 			$status = 'Berhasil menambah user baru.';

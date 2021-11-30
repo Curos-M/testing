@@ -78,7 +78,16 @@ class KaderController extends Controller
 
 	public function grid(Request $request)
 	{
-		$data = Kader::leftJoin('jenjang as j', 'jenjang_anggota', '=', 'j.id')->select([
+    $user = Kader::find(Auth::user()->anggota_id);
+		$data = Kader::leftJoin('jenjang as j', 'jenjang_anggota', '=', 'j.id')
+    ->when(Auth::user()->can('filter-kota/kabupaten'), function($query) use($user){
+      return $query->where('regencies_id', $user->regencies_id);
+    })->when(Auth::user()->can('filter-kecamatan'), function($query) use($user){
+      return $query->where('districts_id', $user->districts_id);
+    })->when(Auth::user()->can('filter-desa/kelurahan'), function($query) use($user){
+      return $query->where('villages_id', $user->villages_id);
+    })
+    ->select([
       'kader.id',
       'kader.nomor_urut',
       'nama_lengkap',
@@ -146,13 +155,20 @@ class KaderController extends Controller
 
 	public function edit(Request $request, $id = null)
 	{
-    // dd(Kader::latest()->first()->id);
-		$user = Kader::join("_regencies as r", "regencies_id", "=", "r.id")
+    $user = Kader::find(Auth::user()->anggota_id);
+		$kader = Kader::join("_regencies as r", "regencies_id", "=", "r.id")
     ->join("_districts as d", "districts_id", "=", "d.id")
     ->join("_villages as v", "villages_id", "=", "v.id")
     ->leftjoin("users as u", 'verif_by', '=', 'u.id')
     ->leftJoin("kader as p", "kader.pasangan_id", '=', 'p.id')
     ->leftJoin("kelompok as k", "kader.id_kelompok", '=', 'k.id')
+    ->when(Auth::user()->can('filter-kota/kabupaten'), function($query) use($user){
+      return $query->where('kader.regencies_id', $user->regencies_id);
+    })->when(Auth::user()->can('filter-kecamatan'), function($query) use($user){
+      return $query->where('kader.districts_id', $user->districts_id);
+    })->when(Auth::user()->can('filter-desa/kelurahan'), function($query) use($user){
+      return $query->where('kader.villages_id', $user->villages_id);
+    })
     ->select('kader.id',
       'kader.nik',
       'kader.nomor_urut',
@@ -191,8 +207,11 @@ class KaderController extends Controller
       'u.full_name as verif_user',
       DB::Raw("to_char(kader.verif_at, 'dd-mm-yyyy hh24:mi:ss')as verif_date")
       )->find($id);
-		$data = $user != null ? $user : $this->__db();
-		$label = $user != null ? 'Ubah' : 'Tambah Baru';
+      if($id && !$kader){
+        abort(404);
+      }
+		$data = $kader != null ? $kader : $this->__db();
+		$label = $kader != null ? 'Ubah' : 'Tambah Baru';
     $kelompok = Kelompok::where('id_pembina', $id)->select('id')->get();
     $data->jumlah_binaan = 0;
     foreach($kelompok as $k){
@@ -200,7 +219,17 @@ class KaderController extends Controller
       $data->jumlah_binaan += $count;
     }
     $jenjang = DB::table('jenjang')->get();
-	
+
+    $user = Auth::user()->anggota_id;
+    $userKader = Kader::find($user);
+    if($userKader){
+      if($userKader->jenjang_anggota > '5')
+        $data->jenjang_visible = true;
+      else
+        $data->jenjang_visible = false;
+    }else
+      $data->jenjang_visible = true;
+
 		$this->setBreadcrumb(['Master Data' => '#', 'Anggota' => '/anggota', $label => '#']);
     $this->setHeader($label);
 
@@ -350,7 +379,7 @@ class KaderController extends Controller
           'full_name' => $kader->nama_lengkap,
           'anggota_id' => $kader->id,
           'created_by' => Auth::user()->getAuthIdentifier()
-        ]);
+        ])->assignRole('Ketua UPA');
       }elseif(!$pembina && $user){
         User::where('anggota_id', $kader->id)->delete();
       }
@@ -373,6 +402,8 @@ class KaderController extends Controller
       $data = Kader::find($id);
       $anak = Anak::where('kader_id', $id);
       $anakKader = Kader::where('ortu_id', $id);
+      $user = User::where('anggota_id', $id);
+
       if($anak && $data->pasangan_id == null){
         $anak->update([
           'deleted_at' => now()->toDateTimeString(),
@@ -402,6 +433,9 @@ class KaderController extends Controller
         Kelompok::where('id_pembina', $id)->update(['deleted_at' => now()->toDateTimeString(), 'deleted_by' => Auth::user()->getAuthIdentifier()]);
       }
 
+      if($user)
+        $user->delete();
+        
       if($data){
         $data->update(['deleted_by' => Auth::user()->getAuthIdentifier()]);
         $data->destroy($id);

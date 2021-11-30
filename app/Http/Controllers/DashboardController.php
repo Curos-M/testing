@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kader;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -17,13 +18,41 @@ class DashboardController extends Controller
   public function index()
 	{
 		$this->setBreadcrumb(['Dashboard' => '#']);
+    $data = new \stdClass;
+    $data->kota = null;
+    $data->kecamatan = null;
+    $data->desa = null;
+    $data->status = null;
+    $user = Kader::find(Auth::user()->anggota_id);
+    if(Auth::user()->can('filter-kota/kabupaten') || Auth::user()->can('filter-kecamatan') || Auth::user()->can('filter-desa/kelurahan')){
+      $data->kota = DB::table('_regencies')->select(['id' ,'name'])->find($user->regencies_id);
+      $data->status = 'kota';
+    }
+    if(Auth::user()->can('filter-kecamatan') || Auth::user()->can('filter-desa/kelurahan')){
+      $data->kecamatan = DB::table('_districts')->select(['id' ,'name'])->find($user->districts_id);
+      $data->status = 'kecamatan';
+    }
+    if(Auth::user()->can('filter-desa/kelurahan')){
+      $data->desa = DB::table('_villages')->select(['id' ,'name'])->find($user->villages_id);
+      $data->status = 'desa';
+    }
     
-		return $this->render('dashboard.index');
+		return $this->render('dashboard.index', ['data' => $data]);
 	}
 
   public function query($request)
   {
-    return Kader::where('verif', '1')
+    $user = Kader::find(Auth::user()->anggota_id);
+    if(Auth::user()->can('filter-kota/kabupaten')){
+      $request->kota = $user->regencies_id;
+    }
+    if(Auth::user()->can('filter-kecamatan')){
+      $request->kecamatan = $user->districts_id;
+    }
+    if(Auth::user()->can('filter-desa/kelurahan')){
+      $request->desa = $user->villages_id;
+    }
+    $data = Kader::where('verif', '1')
     ->when($request->kota, function ($query, $id) {
       return $query->where('regencies_id', $id);  
     })->when($request->kecamatan, function ($query, $id) {
@@ -31,6 +60,7 @@ class DashboardController extends Controller
     })->when($request->desa, function ($query, $id) {
       return $query->where('villages_id', $id);  
     });
+    return $data;
   }
   public function grid(Request $request)
 	{
@@ -61,14 +91,7 @@ class DashboardController extends Controller
     $data->kader_usia['50-59'] = $this->query($request)->whereRaw("date_part('year', age(now() , tanggal_lahir)) >= '50' and date_part('year', age(now() , tanggal_lahir)) < '60'")->count();
     $data->kader_usia['60-69'] = $this->query($request)->whereRaw("date_part('year', age(now() , tanggal_lahir)) >= '60' and date_part('year', age(now() , tanggal_lahir)) < '70'")->count();
     $data->kader_usia['>70'] = $this->query($request)->whereRaw("date_part('year', age(now() , tanggal_lahir)) >= '70'")->count();
-
-    // $data->domisili = $this->query($request)->when(($request->kota == null && $request->kecamatan == null && $request->desa == null), function ($query) {
-    //   return $query->where('provinces_id', '15')->pluck('regencies_id');  
-    // })->when($request->kota, function ($query, $id) {
-    //   return $query->where('regencies_id', $id)->pluck('districts_id'); 
-    // })->when($request->kecamatan, function ($query, $id) {
-    //   return $query->where('districts_id', $id)->pluck('villages_id');  
-    // });
+    
     $idDomisili = DB::table('_regencies')->where('province_id', '15')->pluck('id');
     $qDom = 'regencies_id';
     if($request->kecamatan){

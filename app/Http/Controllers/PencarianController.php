@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kader;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PencarianController extends Controller
 {
@@ -23,62 +24,65 @@ class PencarianController extends Controller
 
   public function grid(Request $request)
 	{
+    $user = Kader::find(Auth::user()->anggota_id);
 		$kader = Kader::where('kader.verif', '1')
     ->leftJoin('_regencies as r', 'kader.regencies_id', '=', 'r.id')
     ->leftJoin('_districts as d', 'kader.districts_id', '=', 'd.id')
     ->leftJoin('_villages as v', 'kader.villages_id', '=', 'v.id')
     ->leftJoin('jenjang as j', 'kader.jenjang_anggota', '=', 'j.id')
     ->leftJoin('kelompok as k', 'kader.id_kelompok', '=', 'k.id')
-    ->leftJoin('kader as p', 'k.id_pembina', '=', 'p.id');
-    if($request->search){
+    ->leftJoin('kader as p', 'k.id_pembina', '=', 'p.id')
+    ->when($request->search, function($query) use($request){
       if($request->type == 1)
-        $kader->where(DB::raw("lower(kader.nama_lengkap)"), "like", DB::raw("lower('%".$request->search."%')"));
+        $query->where(DB::raw("lower(kader.nama_lengkap)"), "like", DB::raw("lower('%".$request->search."%')"));
       if($request->type == 2)
-        $kader->where(DB::raw("lower(kader.nomor_urut)"), "like", DB::raw("lower('%".$request->search."%')"));
+        $query->where(DB::raw("lower(kader.nomor_urut)"), "like", DB::raw("lower('%".$request->search."%')"));
       if($request->type == 3)
-        $kader->where(DB::raw("lower(kader.nik)"), "like", DB::raw("lower('%".$request->search."%')"));
-    }
-    if($request->darah){
-      $kader->where('kader.darah', $request->darah);
-    }
-    if($request->jenjang){
-      $kader->where('kader.jenjang_anggota', $request->jenjang);
-    }
-    if($request->kota){
-      $kader->where('kader.regencies_id', $request->kota);
-    }
-    if($request->kecamatan){
-      $kader->where('kader.districts_id', $request->kecamatan);
-    }
-    if($request->desa){
-      $kader->where('kader.villages_id', $request->desa);
-    }
-    if($request->pembina){
-      $kader->where('k.id_pembina', $request->pembina);
-    }
-    switch($request->umur){
-      case 1:
-        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) < '20'");
-        break;
-      case 2:
-        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '20' and date_part('year', age(now() , kader.tanggal_lahir)) < '30'");
-        break;
-      case 3: 
-        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '30' and date_part('year', age(now() , kader.tanggal_lahir)) < '40'");
-        break;
-      case 4:
-        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '40' and date_part('year', age(now() , kader.tanggal_lahir)) < '50'");
-        break;
-      case 5:
-        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '50' and date_part('year', age(now() , kader.tanggal_lahir)) < '60'");
-        break;
-      case 6:
-        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '60' and date_part('year', age(now() , kader.tanggal_lahir)) < '70'");
-        break;
-      case 7:
-        $kader->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '70'");
-        break;    
-    }
+        $query->where(DB::raw("lower(kader.nik)"), "like", DB::raw("lower('%".$request->search."%')"));
+    })->when($request->darah, function($query, $value){
+      $query->where('kader.darah', $value);
+    })->when($request->jenjang, function($query, $value){
+      $query->where('kader.jenjang_anggota', $value);
+    })->when($request->kota, function($query, $value){
+      $query->where('kader.regencies_id', $value);
+    })->when($request->kecamatan, function($query, $value){
+      $query->where('kader.districts_id', $value);
+    })->when($request->desa, function($query, $value){
+      $query->where('kader.villages_id', $value);
+    })->when($request->pembina, function($query, $value){
+      $query->where('k.id_pembina', $value);
+    })->when($request->umur, function($query, $value){
+      switch($value){
+        case 1:
+          $query->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) < '20'");
+          break;
+        case 2:
+          $query->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '20' and date_part('year', age(now() , kader.tanggal_lahir)) < '30'");
+          break;
+        case 3: 
+          $query->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '30' and date_part('year', age(now() , kader.tanggal_lahir)) < '40'");
+          break;
+        case 4:
+          $query->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '40' and date_part('year', age(now() , kader.tanggal_lahir)) < '50'");
+          break;
+        case 5:
+          $query->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '50' and date_part('year', age(now() , kader.tanggal_lahir)) < '60'");
+          break;
+        case 6:
+          $query->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '60' and date_part('year', age(now() , kader.tanggal_lahir)) < '70'");
+          break;
+        case 7:
+          $query->whereRaw("date_part('year', age(now() , kader.tanggal_lahir)) >= '70'");
+          break;    
+      }
+    })->when(Auth::user()->can('filter-kota/kabupaten'), function($query) use($user){
+      return $query->where('kader.regencies_id', $user->regencies_id);
+    })->when(Auth::user()->can('filter-kecamatan'), function($query) use($user){
+      return $query->where('kader.districts_id', $user->districts_id);
+    })->when(Auth::user()->can('filter-desa/kelurahan'), function($query) use($user){
+      return $query->where('kader.villages_id', $user->villages_id);
+    });
+    
     $data = $kader->select([
       'kader.id',
       'kader.photo',
