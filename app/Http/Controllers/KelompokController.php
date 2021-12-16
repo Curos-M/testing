@@ -81,22 +81,31 @@ class KelompokController extends Controller
   public function editNote(Request $request, $id = null)
 	{
     $user = Auth::user();
-		$data = Kelompok::leftJoin('note_kelompok as nk', 'kelompok.id', '=', 'nk.id_kelompok')
+		$kelompok = Kelompok::leftJoin('note_kelompok as nk', 'kelompok.id', '=', 'nk.id_kelompok')
     ->when(!Auth::user()->can('kelompok-view all'), function($query) use($user){
       $query->where('id_pembina', $user->anggota_id);
     })
     ->find($id);
-      if($id && !$data){
+      if($id && !$kelompok){
         abort(404);
       }
 
-    $data->note = NoteKelompok::where('id_kelompok', $id)->get();
-dd($data->note);
-	
+    $data = NoteKelompok::leftJoin('users as u', 'note_kelompok.created_by', '=', 'u.id')
+    ->where('id_kelompok', $id)
+    ->select([
+      'note_kelompok.id',
+      'catatan',
+      'id_kelompok',
+      'photo',
+      DB::raw("to_char(note_kelompok.created_at, 'dd-mm-yyyy') as tanggal"),
+      DB::raw("to_char(note_kelompok.created_at, 'hh24:mi') as jam"),
+      'u.full_name'
+    ])->orderBy('note_kelompok.created_at', 'desc')->get();
+    
 		$this->setBreadcrumb(['Kelompok' => '#', "Catatan" => '#']);
     $this->setHeader("Catatan");
 
-		return $this->render('kelompok.note', ['data' => $data]);
+		return $this->render('kelompok.note', ['data' => $data, 'id' => $id]);
 	}
 
   public function save(Request $request)
@@ -137,6 +146,22 @@ dd($data->note);
     }else
 		  return response()->json($results);
   }
+  public function saveNote(Request $request)
+  {
+    $request->validate([
+      'id_kelompok' => 'required',
+      'catatan' => 'required_if:photo,null',
+      'photo' => 'required_if:catatan,null'
+    ]);
+			$data = NoteKelompok::create([
+				'id_kelompok' => $request->id_kelompok,
+				'catatan' => $request->catatan,
+        'created_by' => Auth::user()->getAuthIdentifier()
+			]);
+			$status = 'Berhasil menambah catatan baru.';
+      $request->session()->flash('success', $status);
+		  return redirect('/kelompok/catatan/'.$request->id_kelompok);
+  }
   public function delete($id)
 	{
 		$user = Kelompok::destroy($id);
@@ -149,6 +174,30 @@ dd($data->note);
 
 		return response()->json($results);
 	}
+
+  public function deleteNote(request $request, $id)
+	{
+    try{
+      DB::beginTransaction();
+      $data = NoteKelompok::find($id);
+      $idKelompok = NoteKelompok::where('id_kelompok' ,$data->id_kelompok)->where('id', '>', $id)->orderBy('id', 'asc')->first();
+      $data->update(['deleted_by' => Auth::user()->getAuthIdentifier()]);
+      $delete = NoteKelompok::destroy($id);
+  
+      $results = array(
+        'status' => 'success',
+        'action' => 'Hapus Catatan',
+        'messages' => 'Catatan berhasil dihapus',
+        'id' => $idKelompok->id??null
+      );
+      DB::commit();
+    }catch(\Exception $e){
+      DB::rollBack();
+      dd($e);
+    }
+		return response()->json($results);
+	}
+
   public function lihat($id)
 	{
 		$data = Kelompok::find($id);

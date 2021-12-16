@@ -225,6 +225,9 @@
           $(".modal-action-save").on('click', function(){
             window.location.href = "{{url('kelompok/edit')}}/"+id
           })
+          $(".modal-action-dpd").on('click', function(){
+            window.location.href = "{{url('kelompok/catatan')}}/"+id
+          })
         },
         error: function(data){
           alert('error, hubungi admin')

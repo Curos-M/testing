@@ -387,7 +387,7 @@ class KaderController extends Controller
       $request->session()->flash('success', $status);
       DB::commit();
     }catch(\exception $e){
-      DB::rollback();
+      DB::rollBack();
       dd($e);
     }
 		
@@ -455,7 +455,7 @@ class KaderController extends Controller
       }
       DB::commit();
     }catch(\Exception $e){
-      DB::rollback();
+      DB::rollBack();
       dd($e);
       $results = array(
         'status' => 'error',
@@ -577,7 +577,7 @@ class KaderController extends Controller
   
         DB::commit();
       }catch(\Exception $e){
-        DB::rollback();
+        DB::rollBack();
         $results = array(
           'status' => 'error',
           'action' => 'Kesalahan',
