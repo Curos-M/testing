@@ -13,11 +13,11 @@
             <input type="hidden" name="id_kelompok" value="{{$id}}">
             <div class="form-group col-md-12">
               <label for="exampleInputEmail1">Catatan</label>
-              <textarea rows="3" name="catatan" class="form-control"></textarea>
+              <textarea rows="3" id="cttn" name="catatan" class="form-control"></textarea>
             </div>
           </form>  
           <div class="float-right">
-            <a id="addNote" class="btn btn-dpd">Simpan</a>
+            <button id="addNote" disabled class="btn btn-dpd">Simpan</button>
           </div>
         </div>
       </div>
@@ -58,6 +58,12 @@
 @section('js-form')
 <script>
   $(document).ready(function(){
+    $('#cttn').on('keyup', function(){
+      if(this.value)
+        $('#addNote').removeAttr('disabled')
+      else
+        $('#addNote').attr('disabled', true)
+    })
     $('#addNote').on('click', function(){
       swal.fire({
         title:'Tambah Catatan',
