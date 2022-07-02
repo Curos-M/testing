@@ -79,7 +79,7 @@
           <a href="{{url('/kelompok')}}" class="nav-link {{$active->kelompok.' '.$akses->kelompok}}">
             <i class="nav-icon fas fa-users"></i>
             <p>
-              Kelompok
+              Kelompok UPA
             </p>
           </a>
         </li>

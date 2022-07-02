@@ -11,10 +11,17 @@ class AlamatController extends Controller
 {
   public function regency()
   {
-    $user = Kader::find(Auth::user()->anggota_id);
-    if(Auth::user()->can('filter-kota/kabupaten') || Auth::user()->can('filter-kecamatan') || Auth::user()->can('filter-desa/kelurahan')){
-      $value = $user->regencies_id;
-      $rowName = 'id';
+    Auth::user() == null 
+    ? $user = null
+    : $user = Kader::find(Auth::user()->anggota_id);
+    if($user != null){
+      if(Auth::user()->can('filter-kota/kabupaten') || Auth::user()->can('filter-kecamatan') || Auth::user()->can('filter-desa/kelurahan')){
+        $value = $user->regencies_id;
+        $rowName = 'id';
+      }else{
+        $value = '15';
+        $rowName = 'province_id';
+      }
     }else{
       $value = '15';
       $rowName = 'province_id';
@@ -29,13 +36,20 @@ class AlamatController extends Controller
 
   public function district(request $request)
   {
-    $user = Kader::find(Auth::user()->anggota_id);
-    if(Auth::user()->can('filter-kecamatan') || Auth::user()->can('filter-desa/kelurahan')){
-      $value = $user->districts_id;
-      $rowName = 'id';
-    }elseif(Auth::user()->can('filter-kota/kabupaten')){
-      $value = $user->regencies_id;
-      $rowName = 'regency_id';
+    Auth::user() == null
+    ? $user = null
+    : $user = Kader::find(Auth::user()->anggota_id);
+    if($user != null){
+      if(Auth::user()->can('filter-kecamatan') || Auth::user()->can('filter-desa/kelurahan')){
+        $value = $user->districts_id;
+        $rowName = 'id';
+      }elseif(Auth::user()->can('filter-kota/kabupaten')){
+        $value = $user->regencies_id;
+        $rowName = 'regency_id';
+      }else{
+        $value = $request->regency_id;
+        $rowName = 'regency_id';
+      }
     }else{
       $value = $request->regency_id;
       $rowName = 'regency_id';
@@ -50,13 +64,20 @@ class AlamatController extends Controller
 
   public function village(Request $request)
   {
-    $user = Kader::find(Auth::user()->anggota_id);
-    if(Auth::user()->can('filter-desa/kelurahan')){
-      $value = $user->villages_id;
-      $rowName = 'id';
-    }elseif(Auth::user()->can('filter-kecamatan')){
-      $value = $user->districts_id;
-      $rowName = 'district_id';
+    Auth::user() == null 
+    ? $user = null
+    : $user = Kader::find(Auth::user()->anggota_id);
+    if($user != null){
+      if(Auth::user()->can('filter-desa/kelurahan')){
+        $value = $user->villages_id;
+        $rowName = 'id';
+      }elseif(Auth::user()->can('filter-kecamatan')){
+        $value = $user->districts_id;
+        $rowName = 'district_id';
+      }else{
+        $value = $request->district_id;
+        $rowName = 'district_id';
+      }
     }else{
       $value = $request->district_id;
       $rowName = 'district_id';
