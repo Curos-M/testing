@@ -15,6 +15,7 @@ class Kelompok extends Model
       'nama_pembina',
       'nama_kelompok',
       'created_by',
-      'updated_by'
+      'updated_by',
+      'deleted_by'
     ];
 }

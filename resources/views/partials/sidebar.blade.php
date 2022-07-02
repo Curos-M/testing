@@ -68,7 +68,7 @@
           </ul>
         </li>
         <li class="nav-item">
-          <a href="{{url('/verifikasi')}}" class="nav-link {{$active->verif.' '.$akses->verifikasi}}}}">
+          <a href="{{url('/verifikasi')}}" class="nav-link {{$active->verif.' '.$akses->verifikasi}}">
             <i class="nav-icon fas fa-check-square"></i>
             <p>
               Verifikasi

@@ -81,19 +81,9 @@
         <div class="input-group mb-3">
           <input type="hidden" name="_token" value="{{ csrf_token() }}" />
           <input type="text" name="username" class="form-control" placeholder="Username">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-envelope"></span>
-            </div>
-          </div>
         </div>
         <div class="input-group mb-3">
           <input type="password" class="form-control" name="password" placeholder="Password">
-          <div class="input-group-append">
-            <div class="input-group-text">
-              <span class="fas fa-lock"></span>
-            </div>
-          </div>
         </div>
         <div class="row">
           <div class="col-8">

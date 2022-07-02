@@ -15,6 +15,7 @@ class NoteKelompok extends Model
     'catatan',
     'photo',
     'created_by',
-    'updated_by'
+    'updated_by',
+    'deleted_by'
   ];
 }
