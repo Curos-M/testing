@@ -218,7 +218,7 @@
                     </div>      
                     <div class="form-group col-md-12">
                       <label for="exampleInputPassword1">Direkomendasikan Oleh</label>
-                      <input required type="text" class="form-control" value="{{old('rekomendasi')}}" name="rekomendasi" placeholder="Direkomendasikan oleh (Opsional)">
+                      <input type="text" class="form-control" value="{{old('rekomendasi')}}" name="rekomendasi" placeholder="Direkomendasikan oleh (Opsional)">
                     </div>         
                     <div class="custom-file-container col-md-6 form-group" data-upload-id="myFirstImage1">
                       <label>Foto KTP <a href="javascript:void(0)" class="custom-file-container__image-clear" id="imgKtp" style="color: #FD5000;" title="Clear Image">&nbsp;&times;</a></label>

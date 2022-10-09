@@ -72,7 +72,8 @@ class Controller extends BaseController
         'username'    => Auth::user()->full_name,
         'canEdit'     => Auth::user()->can($this->url.'-edit'),
         'canAdd'      => Auth::user()->can($this->url.'-add'),
-        'canDelete'   => Auth::user()->can($this->url.'-delete')
+        'canDelete'   => Auth::user()->can($this->url.'-delete'),
+        'anggota_id'  => Auth::user()->anggota_id
       ];
       return view($view, array_merge($data, $additional));
     }

@@ -15,6 +15,12 @@
           <i class="fa fa-caret-down"></i>
         </a>
         <div class="dropdown-menu dropdown-menu-md dropdown-menu-right">
+          @if($anggota_id != 0)
+          <a href="{{url('anggota/edit').'/' .$anggota_id}}" class="dropdown-item">
+            Profile
+          </a>
+          <div class="dropdown-divider"></div>
+          @endif
           <a href="#" class="dropdown-item">
             Ganti Password
           </a>

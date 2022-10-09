@@ -259,6 +259,7 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                 <input type="text" class="form-control" name="amanah" value="{{old('amanah', $data->amanah)}}" placeholder="Amanah/Kontribusi Anggota">
               </div>
             </div>
+            <button typee="cetak" class="btn btn-dpd float-left ml-2 mt-3">Cetak</button>
             <button type="submit" id="subForm" class="btn btn-dpd float-right ml-2 mt-3">Simpan</button>
             <a href="{{ url()->previous() == url()->current() ? url('/'.$link) : url()->previous()}}" type="button" class="btn btn-black float-right mt-3">{{ isset($data->id) ? 'Kembali' : 'Batal' }}</a>
   </form>

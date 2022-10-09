@@ -164,7 +164,17 @@ class KelompokController extends Controller
   }
   public function delete($id)
 	{
-		$user = Kelompok::destroy($id);
+    try{
+      DB::beginTransaction();
+      $user = Kelompok::destroy($id);
+      $kader = Kader::where('id_kelompok', $id)
+      ->update(['id_kelompok' => null, 'updated_by' => Auth::user()->getAuthIdentifier()]);
+  
+      DB::commit();
+    }catch(\Exception $e){
+      DB::rollBack();
+      dd($e);
+    }
 
 		$results = array(
 			'status' => 'success',

@@ -83,6 +83,7 @@
       </div>
       <div class="col-12 mt-2">
         <div class="float-right">
+          <button class="btn btn-dpd" id="button">Cetak</button>
           <button class="btn btn-dpd" id="button">Cari</button>
         </div>
       </div>
@@ -91,19 +92,19 @@
           <thead>
             <tr>
               <th>Nama Lengkap</th>
-              <th>Nomor Anggota</th>
+              <th>Jenjang Keanggotaan</th>
+              <th>Nama Pembina</th>
+              <th>Nomor Hp</th>
               <th>NIK</th>
               <th>Tempat, Tanggal Lahir</th>
               <th>Jenis Kelamin</th>
               <th>Foto</th>
               <th>Alamat</th>
-              <th>Nomor HP</th>
               <th>Pekerjaan</th>
               <th>Pendidikan</th>
               <th>Golongan Darah</th>
-              <th>Jenjang Keanggotaan</th>
+              <th>Nomor Anggota</th>
               <th>Usia Jenjang</th>
-              <th>Nama Pembina</th>
             </tr>
           </thead>
           <tbody>
@@ -198,7 +199,30 @@
           data: 'nama_lengkap',
         },
         { 
-          data: 'nomor_urut',
+          data:'nama_jenjang',
+          orderable: false,
+        },
+        { 
+          data:'nama_pembina',
+          orderable: false,
+          render: function(data, type, full, meta){
+            if( !meta.settings._responsive.s.current[2]){
+              var span = "<br><span>"+data
+              if(full.nama_kelompok)
+                span +=" ("+full.nama_kelompok+")"
+              +"</span>";
+            }else{
+              var span = "<span>"+data
+              if(full.nama_kelompok)
+                span +=" ("+full.nama_kelompok+")"
+              +"</span>";
+            }
+            return span
+          }
+        },
+        { 
+          data: 'telp',
+          orderable: false,
         },
         { 
           data: 'nik',
@@ -208,7 +232,7 @@
           data:'tempat_tanggal_lahir',
           orderable: false,
           render: function(data, type, full, meta){
-            if(!meta.settings._responsive.s.current[3])
+            if(!meta.settings._responsive.s.current[5])
               return "<br><span>"+data+"<br>("+full.usia+")</span>";
             else
               return "<span>"+data+"<br>("+full.usia+")</span>";
@@ -232,15 +256,11 @@
           data:'alamat',
           orderable: false,
           render: function(data, type, full, meta){
-            if( !meta.settings._responsive.s.current[6])
+            if( !meta.settings._responsive.s.current[8])
               return "<br><span>"+data+"<br>"+full.village_name+"<br>"+full.districts_name+"<br>"+full.regencies_name+"</span>";
             else
               return "<span>"+data+"<br>"+full.village_name+"<br>"+full.districts_name+"<br>"+full.regencies_name+"</span>";
           }
-        },
-        { 
-          data: 'telp',
-          orderable: false,
         },
         { 
           data:'job',
@@ -255,35 +275,16 @@
           orderable: false,
         },
         { 
-          data:'nama_jenjang',
-          orderable: false,
+          data: 'nomor_urut',
         },
         { 
           data:'usia_jenjang',
           orderable: false,
           render: function(data, type, full, meta){
-            if( !meta.settings._responsive.s.current[12])
+            if( !meta.settings._responsive.s.current[13])
               return "<br><span>"+data+"<br>("+full.usia_jenjang_raw+")</span>";
             else
               return "<span>"+data+"<br>("+full.usia_jenjang_raw+")</span>";
-          }
-        },
-        { 
-          data:'nama_pembina',
-          orderable: false,
-          render: function(data, type, full, meta){
-            if( !meta.settings._responsive.s.current[13]){
-              var span = "<br><span>"+data
-              if(full.nama_kelompok)
-                span +=" ("+full.nama_kelompok+")"
-              +"</span>";
-            }else{
-              var span = "<span>"+data
-              if(full.nama_kelompok)
-                span +=" ("+full.nama_kelompok+")"
-              +"</span>";
-            }
-            return span
           }
         },
       ],
