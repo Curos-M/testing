@@ -286,7 +286,7 @@ $verifDisabled = $data->verif ? 'disabled' : null;
                     <th>Nama</th>
                     <th>Tahun Lahir</th>
                     <th>Pendidikan</th>
-                    <th>Tarbiyah</th>
+                    <th>Terbina</th>
                     <th></th>
                   </tr>
                 </thead>
