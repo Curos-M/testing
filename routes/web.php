@@ -35,8 +35,9 @@ Route::get('/village',  [AlamatController::class, 'village']);
 
 Route::group(['middleware' => 'auth'], function() {
   Route::get('/',  [DashboardController::class, 'index']);	
-  Route::post('/grid',  [DashboardController::class, 'grid']);	
-
+  Route::post('/grid',  [DashboardController::class, 'grid'])->middleware('can:dashboard-view');	
+  Route::post('/pertumbuhan',  [DashboardController::class, 'pertumbuhan'])->middleware('can:dashboard-view');  
+  
   Route::get('/user',  [UserController::class, 'index'])->middleware('can:user-view');	
 	Route::get('/user/edit/{id?}',  [UserController::class, 'edit'])->middleware('can:user-view');	
 	Route::get('/user/grid',  [UserController::class, 'grid'])->middleware('can:user-view');	

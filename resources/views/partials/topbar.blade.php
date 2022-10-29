@@ -16,7 +16,7 @@
         </a>
         <div class="dropdown-menu dropdown-menu-md dropdown-menu-right">
           @if($anggota_id != 0)
-          <a href="{{url('anggota/edit').'/' .$anggota_id}}" class="dropdown-item">
+          <a href="{{url('/')}}" class="dropdown-item">
             Profile
           </a>
           <div class="dropdown-divider"></div>

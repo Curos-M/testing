@@ -40,24 +40,21 @@
 <script>
   $(document).ready(function (){
     $("#grid thead").hide();
-    $('#appModal').on('hide.bs.modal', function() {
-      $('#appModal').find('.modal-body').html('');
-      $('#dpdModal').unbind()
-    });
     let grid = $('#grid').DataTable({
       buttons: [
         { 
           text: "Tambah Baru",
           className: "{{$canAdd ? 'btn btn-dpd' : 'd-none'}}",
           action: function ( e, dt, node, config ) {
-            $('#appModal').modal('show'); 
-            $('.modal-dialog').addClass('modal-md')
-            $('.modal-header').css("border-bottom-width", "5px")
-            $('.modal-header').css("border-bottom-style", "solid")
-            $('.modal-header').css("border-bottom-color", "rgb(253, 80, 0)")
-            $(".modal-title").html('Tambah Kelompok')
-            $(".btn-dpd").removeClass('d-none')  
-            $("#dpdModal").html('Simpan')  
+            let modal = cloneModal($("#appModal"))
+            modal.modal('show')
+            modal.find('.modal-dialog').addClass('modal-md')
+            modal.find('.modal-header').css("border-bottom-width", "5px")
+            modal.find('.modal-header').css("border-bottom-style", "solid")
+            modal.find('.modal-header').css("border-bottom-color", "rgb(253, 80, 0)")
+            modal.find(".modal-title").html('Tambah Kelompok')
+            modal.find(".btn-dpd").removeClass('d-none')  
+            modal.find("#dpdModal").html('Simpan')  
             let body = ""
             body += 
             "<div class='col-md-12 mt-2'"+
@@ -72,8 +69,8 @@
                 "</div>"+
               "</div>"+
             "</div>"
-            $('#appModal').find('.modal-body').append(body);
-            $('#dpdModal').on('click', function(){
+            modal.find('.modal-body').append(body);
+            modal.find('#dpdModal').on('click', function(){
               let nama = $('#nama_kelompok').val()
               let id = $('#pembina').val()
               $.ajax({
@@ -174,18 +171,20 @@
         url   : "{{$link}}/view/"+id,
         success: function(data){
           var winWidth =  $(window).width();
-          $('#appModal').modal('show'); 
-          $('.modal-dialog').addClass('modal-lg')
-          $('.modal-header').css("border-bottom-width", "5px")
-          $('.modal-header').css("border-bottom-style", "solid")
-          $('.modal-header').css("border-bottom-color", "rgb(253, 80, 0)")
-          $(".modal-title").html(data.nama_kelompok)
-          $(".btn-dpd").removeClass('d-none')  
-          $(".modal-action-save").removeClass('d-none')
-          $(".modal-action-save").html('Edit')
-          $("#dpdModal").html('Catatan')
-          $('.modal-action-close').html('Tutup') 
-          $('.modal-action-close').addClass('mr-auto') 
+          let modal = cloneModal($("#appModal"))
+          modal.modal('show')
+          modal.modal('show'); 
+          modal.find('.modal-dialog').addClass('modal-lg')
+          modal.find('.modal-header').css("border-bottom-width", "5px")
+          modal.find('.modal-header').css("border-bottom-style", "solid")
+          modal.find('.modal-header').css("border-bottom-color", "rgb(253, 80, 0)")
+          modal.find(".modal-title").html(data.nama_kelompok)
+          modal.find(".btn-dpd").removeClass('d-none')  
+          modal.find(".modal-action-save").removeClass('d-none')
+          modal.find(".modal-action-save").html('Edit')
+          modal.find("#dpdModal").html('Catatan')
+          modal.find('.modal-action-close').html('Tutup') 
+          modal.find('.modal-action-close').addClass('mr-auto') 
           let body = ""
           if(data.note){
             var tanggal = "Tanggal Dibuat : "+data.note.tanggal
@@ -221,11 +220,11 @@
               "</div>"+
             "</div>"+
           "</div>"
-          $('#appModal').find('.modal-body').append(body);
-          $(".modal-action-save").on('click', function(){
+          modal.find('.modal-body').append(body);
+          modal.find(".modal-action-save").on('click', function(){
             window.location.href = "{{url('kelompok/edit')}}/"+id
           })
-          $(".modal-action-dpd").on('click', function(){
+          modal.find(".modal-action-dpd").on('click', function(){
             window.location.href = "{{url('kelompok/catatan')}}/"+id
           })
         },

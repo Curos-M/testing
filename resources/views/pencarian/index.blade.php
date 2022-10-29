@@ -83,7 +83,6 @@
       </div>
       <div class="col-12 mt-2">
         <div class="float-right">
-          <button class="btn btn-dpd" id="button">Cetak</button>
           <button class="btn btn-dpd" id="button">Cari</button>
         </div>
       </div>

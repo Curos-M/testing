@@ -191,17 +191,18 @@
               "</div>"+
             "</div>";        
           }
-          $('#appModal').modal('show'); 
-          $('.modal-dialog').addClass('modal-lg')
-          $('.modal-header').css("border-bottom-width", "5px")
-          $('.modal-header').css("border-bottom-style", "solid")
-          $('.modal-header').css("border-bottom-color", "rgb(253, 80, 0)")
-          $(".modal-title").html('Detail Anggota')
-          $(".btn-dpd").removeClass('d-none')
-          $('.btn-dpd').on('click', function(){
+          let modal = cloneModal($("#appModal"))
+          modal.modal('show')
+          modal.find('.modal-dialog').addClass('modal-lg')
+          modal.find('.modal-header').css("border-bottom-width", "5px")
+          modal.find('.modal-header').css("border-bottom-style", "solid")
+          modal.find('.modal-header').css("border-bottom-color", "rgb(253, 80, 0)")
+          modal.find(".modal-title").html('Detail Anggota')
+          modal.find(".btn-dpd").removeClass('d-none')
+          modal.find('.btn-dpd').on('click', function(){
             location.href = "{{url('anggota/edit')}}/"+data.id;
           })
-          $('#appModal').find('.modal-body').append(body);
+          modal.find('.modal-body').append(body);
         },
         error: function(data){
           alert('error, hubungi admin')

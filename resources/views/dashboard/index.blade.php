@@ -107,6 +107,34 @@
       </div>
     </div>
   </div>
+  <div class="col-md-12">
+    <div class="card card-default color-palette-box">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-sm-12">
+            <select class="form-control selectbs4 form-control-sm" style="width: 100%;" id="tahun">
+              @foreach ($data->tahun as $tahun)
+                <option value="{{ $tahun['tahun'] }}" >{{ $tahun['tahun'] }}</option>
+              @endforeach
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <h3 id="pertumbuhanTitle" class="card-title">Pertumbuhan Anggota</h3>
+        <div class="card-tools">
+          <button type="button" class="btn btn-tool" data-card-widget="collapse">
+            <i class="fas fa-window-minimize"></i>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <canvas id="pertumbuhan" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+      </div>
+    </div>
+  </div>
 </div>
 
 @endsection
@@ -382,6 +410,81 @@
         }
       })
     }
+
+    function pertumbuhan(){
+      $('#pertumbuhanTitle').text("Pertumbuhan Anggota "+$('#tahun').val())
+      $.ajax({
+        type: 'POST',
+        url: "{{url($link).'/pertumbuhan'}}",
+        data: {
+          tahun: $('#tahun').val()
+        },
+        success:function(data){
+          pertumbuhanChart = new Chart($('#pertumbuhan').get(0).getContext('2d'), {
+            type: 'bar',
+            data: {
+              labels  : ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+              datasets: [
+                {
+                  backgroundColor     : '#fd5000',
+                  borderColor         : 'rgba(210, 214, 222, 1)',
+                  pointRadius         : false,
+                  pointColor          : 'rgba(210, 214, 222, 1)',
+                  pointStrokeColor    : '#c1c7d1',
+                  pointHighlightFill  : '#fff',
+                  pointHighlightStroke: 'rgba(220,220,220,1)',
+                  data                : 
+                                      [
+                                        data['jan'], 
+                                        data['feb'], 
+                                        data['mar'], 
+                                        data['apr'], 
+                                        data['mei'], 
+                                        data['jun'], 
+                                        data['jul'],
+                                        data['agu'],
+                                        data['sep'],
+                                        data['okt'],
+                                        data['nov'],
+                                        data['des']
+                                      ]
+                },
+              ]
+            },
+            options: {
+              responsive              : true,
+              maintainAspectRatio     : false,
+              datasetFill             : false,
+              legend: {
+                display: false
+              },
+              scales: {
+                yAxes: [{
+                  ticks: {
+                    beginAtZero: true,
+                    userCallback: function(label, index, labels) {
+                      if (Math.floor(label) === label) {
+                        return label;
+                      }
+                    },
+                  }
+                }]
+              },
+              tooltips: {
+                callbacks: {
+                  label: function(tooltipItem) {
+                    return tooltipItem.yLabel;
+                  }
+                }
+              }
+            }
+          })
+        }
+      })
+    }
+    $('#tahun').on('change', function(){
+      pertumbuhan();
+    })
     $('#kota').on('change', function(){
       if(this.value){
         $('#kecamatan').removeAttr('disabled')
@@ -448,6 +551,7 @@
     camat()
     desa()
     call()
+    pertumbuhan()
 
 
   });

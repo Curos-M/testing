@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Kader;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\KaderController;
 
 class DashboardController extends Controller
 {
@@ -17,12 +18,17 @@ class DashboardController extends Controller
 
   public function index()
 	{
+    if(!Auth::user()->can('dashboard-view')){
+      $kader = new KaderController;
+      return $kader->edit(Auth::user()->anggota_id);
+    }
 		$this->setBreadcrumb(['Dashboard' => '#']);
     $data = new \stdClass;
     $data->kota = null;
     $data->kecamatan = null;
     $data->desa = null;
     $data->status = null;
+    $data->tahun = null;
     $user = Kader::find(Auth::user()->anggota_id);
     if(Auth::user()->can('filter-kota/kabupaten') || Auth::user()->can('filter-kecamatan') || Auth::user()->can('filter-desa/kelurahan')){
       $data->kota = DB::table('_regencies')->select(['id' ,'name'])->find($user->regencies_id);
@@ -36,6 +42,7 @@ class DashboardController extends Controller
       $data->desa = DB::table('_villages')->select(['id' ,'name'])->find($user->villages_id);
       $data->status = 'desa';
     }
+    $data->tahun = Kader::select([DB::raw("distinct to_char(awal_anggota, 'yyyy') as tahun")])->orderBy("tahun", 'asc')->get();
     
 		return $this->render('dashboard.index', ['data' => $data]);
 	}
@@ -120,4 +127,24 @@ class DashboardController extends Controller
     
 		return response()->json($data);
 	}
+
+  public function pertumbuhan(Request $request){
+    $tahun = $request->tahun;
+    $data = Kader::select([
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '01' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as jan"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '02' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as feb"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '03' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as mar"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '04' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as apr"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '05' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as mei"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '06' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as jun"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '07' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as jul"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '08' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as agu"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '09' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as sep"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '10' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as okt"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '11' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as nov"),
+      DB::raw("(select count(*) from kader where to_char(awal_anggota, 'mm') = '12' and to_char(awal_anggota, 'yyyy') = '".$tahun."') as des")
+    ])->first();
+    
+    return response()->json($data);
+  }
 }

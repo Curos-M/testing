@@ -153,7 +153,7 @@ class KaderController extends Controller
 		return response()->json($data);
 	}
 
-	public function edit(Request $request, $id = null)
+	public function edit($id = null)
 	{
     $user = Kader::find(Auth::user()->anggota_id);
 		$kader = Kader::join("_regencies as r", "regencies_id", "=", "r.id")
@@ -391,7 +391,9 @@ class KaderController extends Controller
       dd($e);
     }
 		
-
+    if(Auth::user()->anggota_id == $kader->id){
+      return redirect('/');  
+    }
 		return redirect('/anggota/edit'.'/'.$kader->id);
 	}
 
